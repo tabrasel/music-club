@@ -1,0 +1,19 @@
+{
+  "name": "music-club",
+  "version": "1.0.0",
+  "description": "An editor for tracking music club activity",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tabrasel/music-club.git"
+  },
+  "author": "Tate Brasel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tabrasel/music-club/issues"
+  },
+  "homepage": "https://github.com/tabrasel/music-club#readme"
+}
