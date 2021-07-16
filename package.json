@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/tabrasel/music-club#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.13.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
