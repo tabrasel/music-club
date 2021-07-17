@@ -46,9 +46,12 @@ class AlbumModel {
     AlbumModel.model = mongoose.model<IAlbum>('Album', schema);
   }
 
-  // Create a new album document
-  public static createAlbum(albumInfo: any, res: Response): any {
+  /**
+   * Create a new album document.
+   */
+  public static createAlbum(req: any, res: Response): void {
     // Define a document for the album
+    const albumInfo = req.body;
     const albumDoc: IAlbum = {
       id: uuidv4(),
       title: albumInfo.title,
@@ -70,12 +73,14 @@ class AlbumModel {
     });
   }
 
-  // Get a specified album
-  public static getAlbum(res: Response, filter: any): any {
-    const query = this.model.findOne(filter);
+  /**
+   * Get a specified album.
+   */
+  public static getAlbum(req: any, res: Response): void {
+    const query: any = AlbumModel.model.findOne(req.query);
     query.exec((err: NativeError, album: Document) => {
       if (err) {
-        res.json("Failed to get member");
+        res.json("Failed to get album");
       } else {
         res.json(album);
       }
