@@ -19,7 +19,7 @@ AlbumModel.setup();
 MemberModel.setup();
 
 // Define Express server
-const expressApp = express();
+const expressApp: Application = express();
 
 // Make server use routes
 expressApp.use(albumRoutes);

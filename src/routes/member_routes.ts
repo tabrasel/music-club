@@ -4,7 +4,7 @@ import { Request, Response, Router } from 'express';
 // Import model
 import { MemberModel } from '../models/MemberModel';
 
-const router = Router();
+const router: Router = Router();
 
 // Create a new member
 router.post('/api/member', (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ router.post('/api/member', (req: Request, res: Response) => {
 
 // Get an album
 router.get('/api/member', (req: any, res: Response) => {
-  if ('id' in req.query || ('firstName' in req.query && 'lastName' in req.query) ) {
+  if ('id' in req.query || ('firstName' in req.query && 'lastName' in req.query)) {
     return MemberModel.getMember(req, res);
   }
 

@@ -4,7 +4,7 @@ import { Request, Response, Router } from 'express';
 // Import model
 import { AlbumModel } from '../models/AlbumModel';
 
-const router = Router();
+const router: Router = Router();
 
 // Create a new album
 router.post('/api/album', (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ router.post('/api/album', (req: Request, res: Response) => {
 
 // Get an album
 router.get('/api/album', (req: any, res: Response) => {
-  if ('id' in req.query || ('title' in req.query && 'artist' in req.query) ) {
+  if ('id' in req.query || ('title' in req.query && 'artist' in req.query)) {
     return AlbumModel.getAlbum(req, res);
   }
 
