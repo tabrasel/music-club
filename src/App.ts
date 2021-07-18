@@ -1,6 +1,5 @@
 import express, { Application } from 'express';
 
-import { AlbumModel } from './models/albumModel';
 import { Database } from './Database';
 
 import albumRoutes from './routes/album_routes';
