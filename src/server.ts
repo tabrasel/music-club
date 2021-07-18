@@ -9,20 +9,23 @@ import { MemberModel } from './models/MemberModel';
 
 // Import routes
 import albumRoutes from './routes/album_routes';
+import memberRoutes from './routes/member_routes';
 
-// Connect to the database
+// Connect to database
 Database.connect();
 
 // Set up models
 AlbumModel.setup();
 MemberModel.setup();
 
-// Set up and start Express server
-
+// Define Express server
 const expressApp = express();
 
+// Make server use routes
 expressApp.use(albumRoutes);
+expressApp.use(memberRoutes);
 
+// Make server listen for requests
 expressApp.listen(process.env.PORT || 80);
 
 // tslint:disable-next-line:no-console
