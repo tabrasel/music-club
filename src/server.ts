@@ -6,6 +6,7 @@ import { Database } from './Database';
 // Import models
 import { AlbumModel } from './models/AlbumModel';
 import { MemberModel } from './models/MemberModel';
+import { RoundModel } from './models/RoundModel';
 
 // Import routes
 import albumRoutes from './routes/album_routes';
@@ -17,6 +18,7 @@ Database.connect();
 // Set up models
 AlbumModel.setup();
 MemberModel.setup();
+RoundModel.setup();
 
 // Define Express server
 const expressApp: Application = express();
