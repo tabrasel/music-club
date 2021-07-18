@@ -1,3 +1,4 @@
+// Import modules
 import express, { Response } from 'express';
 import mongoose, { Document, NativeError, Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,7 +23,7 @@ class AlbumModel {
 
   private static model: mongoose.Model<IAlbum>;
 
-  public constructor() {
+  public static setup(): void {
     // Define album schema
     const schema: mongoose.Schema = new mongoose.Schema(
       {
@@ -43,7 +44,7 @@ class AlbumModel {
     );
 
     // Compile album model
-    AlbumModel.model = mongoose.model<IAlbum>('Album', schema);
+    this.model = mongoose.model<IAlbum>('Album', schema);
   }
 
   /**
@@ -77,7 +78,7 @@ class AlbumModel {
    * Get a specified album.
    */
   public static getAlbum(req: any, res: Response): void {
-    const query: any = AlbumModel.model.findOne(req.query);
+    const query: any = this.model.findOne(req.query);
     query.exec((err: NativeError, album: Document) => {
       if (err) {
         res.json("Failed to get album");

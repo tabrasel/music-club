@@ -1,8 +1,10 @@
+// Import modules
 import { Request, Response, Router } from 'express';
+
+// Import model
 import { AlbumModel } from '../models/AlbumModel';
 
 const router = Router();
-const albumModel = new AlbumModel();
 
 // Create a new album
 router.post('/api/album', (req: Request, res: Response) => {

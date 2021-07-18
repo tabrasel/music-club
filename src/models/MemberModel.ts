@@ -1,3 +1,4 @@
+// Import modules
 import express, { Response } from 'express';
 import mongoose, { Document, NativeError, Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +16,7 @@ class MemberModel {
 
   private static model: mongoose.Model<IMember>;
 
-  public constructor() {
+  public static setup(): void {
     // Define member schema
     const schema: mongoose.Schema = new mongoose.Schema(
       {
@@ -29,7 +30,7 @@ class MemberModel {
     );
 
     // Compile member model from schema
-    MemberModel.model = mongoose.model<IMember>('Member', schema);
+    this.model = mongoose.model<IMember>('Member', schema);
   }
 
   /**
@@ -60,7 +61,7 @@ class MemberModel {
    * Get a specified member.
    */
   public static getMember(req: any, res: Response): void {
-    const query: any = MemberModel.model.findOne(req.query);
+    const query: any = this.model.findOne(req.query);
     query.exec((err: NativeError, member: Document) => {
       if (err) {
         res.json("Failed to get member");

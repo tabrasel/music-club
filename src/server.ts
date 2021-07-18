@@ -3,11 +3,21 @@ import express, { Application } from 'express';
 
 import { Database } from './Database';
 
+// Import models
+import { AlbumModel } from './models/AlbumModel';
+import { MemberModel } from './models/MemberModel';
+
 // Import routes
 import albumRoutes from './routes/album_routes';
 
 // Connect to the database
 Database.connect();
+
+// Set up models
+AlbumModel.setup();
+MemberModel.setup();
+
+// Set up and start Express server
 
 const expressApp = express();
 
