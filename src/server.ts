@@ -11,6 +11,7 @@ import { RoundModel } from './models/RoundModel';
 // Import routes
 import albumRoutes from './routes/album_routes';
 import memberRoutes from './routes/member_routes';
+import roundRoutes from './routes/round_routes';
 
 // Connect to database
 Database.connect();
@@ -26,6 +27,7 @@ const expressApp: Application = express();
 // Make server use routes
 expressApp.use(albumRoutes);
 expressApp.use(memberRoutes);
+expressApp.use(roundRoutes);
 
 // Make server listen for requests
 expressApp.listen(process.env.PORT || 80);
