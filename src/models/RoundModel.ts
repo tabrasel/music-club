@@ -18,7 +18,7 @@ class RoundModel {
   private static model: Model<IRound>;
 
   public static setup(): void {
-    // Define album schema
+    // Define round schema
     const schema: Schema = new Schema(
       {
         id: String,
