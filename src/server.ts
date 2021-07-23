@@ -1,5 +1,6 @@
 // Import modules
 import express, { Application } from 'express';
+import cors from 'cors';
 
 import { Database } from './Database';
 
@@ -24,12 +25,15 @@ RoundModel.setup();
 // Define Express server
 const expressApp: Application = express();
 
-// Make server use routes
+// Add middleware to server
+expressApp.use(cors());
+
+// Add routes to server
 expressApp.use(albumRoutes);
 expressApp.use(memberRoutes);
 expressApp.use(roundRoutes);
 
-// Make server listen for requests
+// Have server listen for requests
 expressApp.listen(process.env.PORT || 80);
 
 // tslint:disable-next-line:no-console
