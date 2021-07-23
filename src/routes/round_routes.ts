@@ -21,4 +21,9 @@ router.get('/api/round', (req: any, res: Response) => {
   res.json('Missing required args: [id] or [number]');
 });
 
+// Get all rounds
+router.get('/api/rounds', (req: any, res: Response) => {
+  return RoundModel.getAllRounds(res);
+});
+
 export default router;

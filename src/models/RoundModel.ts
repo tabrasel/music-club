@@ -74,6 +74,17 @@ class RoundModel {
     });
   }
 
+  /**
+   * Get all rounds.
+   */
+  public static getAllRounds(res: any): any {
+    const query = this.model.find({});
+    query.exec((err, rounds) => {
+      if (err) res.json("Failed to get all rounds");
+      res.json(rounds);
+    });
+  }
+
 }
 
 export { RoundModel };
