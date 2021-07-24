@@ -27,6 +27,8 @@ const expressApp: Application = express();
 
 // Add middleware to server
 expressApp.use(cors());
+expressApp.use(express.json());
+expressApp.use(express.urlencoded({ extended: true }));
 
 // Add routes to server
 expressApp.use(albumRoutes);
