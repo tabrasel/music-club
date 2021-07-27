@@ -61,6 +61,24 @@ class RoundModel {
   }
 
   /**
+   * Update an existing round.
+   */
+  public static updateRound(req: any, res: Response): any {
+    const filter: any = { id: req.query.id };
+    const updatedData: any = req.body;
+
+    const query = this.model.findOneAndUpdate(filter, updatedData, { new: true });
+
+    query.exec((err: NativeError, updatedRound) => {
+      if (err) {
+        res.json("Failed to update round");
+      } else {
+        res.json(updatedRound);
+      }
+    });
+  }
+
+  /**
    * Get a specified round from the database.
    */
   public static getRound(req: any, res: Response): void {

@@ -11,6 +11,11 @@ router.post('/api/round', (req: Request, res: Response) => {
   return RoundModel.createRound(req, res);
 });
 
+// Update an existing round
+router.put('/api/round', (req: any, res: Response) => {
+  return RoundModel.updateRound(req, res);
+});
+
 // Get a round
 router.get('/api/round', (req: any, res: Response) => {
   if ('id' in req.query || 'number' in req.query) {
