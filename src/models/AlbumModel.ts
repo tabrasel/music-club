@@ -75,6 +75,24 @@ class AlbumModel {
   }
 
   /**
+   * Update an existing album.
+   */
+  public static updateAlbum(req: any, res: Response): any {
+    const filter: any = { id: req.query.id };
+    const updatedData: any = req.body;
+
+    const query = this.model.findOneAndUpdate(filter, updatedData, { new: true });
+
+    query.exec((err: NativeError, updatedAlbum) => {
+      if (err) {
+        res.json("Failed to update album");
+      } else {
+        res.json(updatedAlbum);
+      }
+    });
+  }
+
+  /**
    * Get a specified album.
    */
   public static getAlbum(req: any, res: Response): void {
