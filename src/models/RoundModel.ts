@@ -67,7 +67,11 @@ class RoundModel {
     const filter: any = { id: req.query.id };
     const updatedData: any = req.body;
 
-    const query = this.model.findOneAndUpdate(filter, updatedData, { new: true });
+    const query = this.model.findOneAndUpdate(
+      filter,
+      updatedData,
+      { new: true, useFindAndModify: false }
+    );
 
     query.exec((err: NativeError, updatedRound) => {
       if (err) {
