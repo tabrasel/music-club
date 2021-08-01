@@ -96,6 +96,21 @@ class AlbumModel {
     });
   }
 
+  public static deleteAlbum(req: any, res: Response): any {
+    // tslint:disable-next-line:no-console
+    console.log("deleting album");
+
+    const query: any = this.model.findOneAndDelete(req.query);
+
+    query.exec((err: NativeError, album: Document) => {
+      if (err) {
+        res.json("Failed to delete album");
+      } else {
+        res.json(album);
+      }
+    });
+  }
+
   /**
    * Get a specified album.
    */

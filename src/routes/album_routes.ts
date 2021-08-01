@@ -16,6 +16,11 @@ router.put('/api/album', (req: any, res: Response) => {
   return AlbumModel.updateAlbum(req, res);
 });
 
+// Delete an existing album
+router.delete('/api/album', (req: any, res: Response) => {
+  return AlbumModel.deleteAlbum(req, res);
+});
+
 // Get an album
 router.get('/api/album', (req: any, res: Response) => {
   if ('id' in req.query || ('title' in req.query && 'artist' in req.query)) {
