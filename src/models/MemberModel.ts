@@ -58,6 +58,28 @@ class MemberModel {
   }
 
   /**
+   * Update an existing member.
+   */
+  public static updateMember(req: any, res: Response): any {
+    const filter: any = { id: req.query.id };
+    const updatedData: any = req.body;
+
+    const query = this.model.findOneAndUpdate(
+      filter,
+      updatedData,
+      { new: true, useFindAndModify: false }
+    );
+
+    query.exec((err: NativeError, updatedMember) => {
+      if (err) {
+        res.json("Failed to update member");
+      } else {
+        res.json(updatedMember);
+      }
+    });
+  }
+
+  /**
    * Get a specified member.
    */
   public static getMember(req: any, res: Response): void {

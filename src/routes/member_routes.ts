@@ -11,6 +11,11 @@ router.post('/api/member', (req: Request, res: Response) => {
   return MemberModel.createMember(req, res);
 });
 
+// Update an existing member
+router.put('/api/member', (req: any, res: Response) => {
+  return MemberModel.updateMember(req, res);
+});
+
 // Get an album
 router.get('/api/member', (req: any, res: Response) => {
   if ('id' in req.query || ('firstName' in req.query && 'lastName' in req.query)) {
