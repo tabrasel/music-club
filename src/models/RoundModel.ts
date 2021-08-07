@@ -83,6 +83,21 @@ class RoundModel {
   }
 
   /**
+   * Delete an existing round.
+   */
+  public static deleteRound(req: any, res: Response): any {
+    const query: any = this.model.findOneAndDelete(req.query);
+
+    query.exec((err: NativeError, round: Document) => {
+      if (err) {
+        res.json("Failed to delete round");
+      } else {
+        res.json(round);
+      }
+    });
+  }
+
+  /**
    * Get a specified round from the database.
    */
   public static getRound(req: any, res: Response): void {

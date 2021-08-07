@@ -16,6 +16,11 @@ router.put('/api/round', (req: any, res: Response) => {
   return RoundModel.updateRound(req, res);
 });
 
+// Delete an existing round
+router.delete('/api/round', (req: any, res: Response) => {
+  return RoundModel.deleteRound(req, res);
+});
+
 // Get a round
 router.get('/api/round', (req: any, res: Response) => {
   if ('id' in req.query || 'number' in req.query) {
