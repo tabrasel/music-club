@@ -16,7 +16,12 @@ router.put('/api/member', (req: any, res: Response) => {
   return MemberModel.updateMember(req, res);
 });
 
-// Get an album
+// Delete an existing member
+router.delete('/api/member', (req: any, res: Response) => {
+  return MemberModel.deleteMember(req, res);
+});
+
+// Get a member
 router.get('/api/member', (req: any, res: Response) => {
   if ('id' in req.query || ('firstName' in req.query && 'lastName' in req.query)) {
     return MemberModel.getMember(req, res);

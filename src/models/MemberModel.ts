@@ -80,6 +80,21 @@ class MemberModel {
   }
 
   /**
+   * Delete an existing member.
+   */
+  public static deleteMember(req: any, res: Response): any {
+    const query: any = this.model.findOneAndDelete(req.query);
+
+    query.exec((err: NativeError, member: Document) => {
+      if (err) {
+        res.json("Failed to delete member");
+      } else {
+        res.json(member);
+      }
+    });
+  }
+
+  /**
    * Get a specified member.
    */
   public static getMember(req: any, res: Response): void {
