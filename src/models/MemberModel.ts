@@ -108,6 +108,17 @@ class MemberModel {
     });
   }
 
+  /**
+   * Get all members.
+   */
+  public static getAllMembers(res: any): any {
+    const query = this.model.find({});
+    query.exec((err, members) => {
+      if (err) res.json("Failed to get all members");
+      res.json(members);
+    });
+  }
+
 }
 
 export { MemberModel };

@@ -31,4 +31,9 @@ router.get('/api/member', (req: any, res: Response) => {
   res.json('Missing required args: [id] or [firstName] & [lastName]');
 });
 
+// Get all members
+router.get('/api/members', (req: any, res: Response) => {
+  return MemberModel.getAllMembers(res);
+});
+
 export default router;
