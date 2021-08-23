@@ -47,7 +47,7 @@ class RoundModel {
       albumIds: [],
       startDate: roundInfo.startDate,
       endDate: roundInfo.endDate,
-      picksPerParticpant: roundInfo.picksPerParticpant,
+      picksPerParticpant: roundInfo.picksPerParticipant,
     }
 
     // Create the round document in the database
