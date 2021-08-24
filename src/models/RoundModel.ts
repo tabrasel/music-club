@@ -10,7 +10,7 @@ interface IRound {
   albumIds: string[],
   startDate: string,
   endDate: string,
-  picksPerParticpant: number
+  picksPerParticipant: number
 }
 
 class RoundModel {
@@ -26,7 +26,7 @@ class RoundModel {
         albumIds: [String],
         startDate: String,
         endDate: String,
-        picksPerParticpant: Number
+        picksPerParticipant: Number
       },
       { collection: 'rounds' }
     );
@@ -47,7 +47,7 @@ class RoundModel {
       albumIds: [],
       startDate: roundInfo.startDate,
       endDate: roundInfo.endDate,
-      picksPerParticpant: roundInfo.picksPerParticipant,
+      picksPerParticipant: roundInfo.picksPerParticipant,
     }
 
     // Create the round document in the database
