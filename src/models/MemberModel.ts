@@ -8,8 +8,9 @@ interface IMember {
   id: string,
   firstName: string,
   lastName: string,
+  color: string,
   participatedRoundIds: string[],
-  postedAlbumIds: string[]
+  postedAlbumIds: string[],
 }
 
 class MemberModel {
@@ -23,6 +24,7 @@ class MemberModel {
         id: String,
         firstName: String,
         lastName: String,
+        color: String,
         participatedRoundIds: [String],
         postedAlbumIds: [String]
       },
@@ -43,6 +45,7 @@ class MemberModel {
       id: uuidv4(),
       firstName: memberInfo.firstName,
       lastName: memberInfo.lastName,
+      color: memberInfo.color,
       participatedRoundIds: [],
       postedAlbumIds: []
     }
