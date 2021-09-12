@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface IRound {
   id: string,
   number: number,
+  participantIds: string[],
   albumIds: string[],
   startDate: string,
   endDate: string,
@@ -23,6 +24,7 @@ class RoundModel {
       {
         id: String,
         number: Number,
+        participantIds: [String],
         albumIds: [String],
         startDate: String,
         endDate: String,
@@ -44,6 +46,7 @@ class RoundModel {
     const roundDoc: IRound = {
       id: uuidv4(),
       number: roundInfo.number,
+      participantIds: roundInfo.participantIds,
       albumIds: [],
       startDate: roundInfo.startDate,
       endDate: roundInfo.endDate,
