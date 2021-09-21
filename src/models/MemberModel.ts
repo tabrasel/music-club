@@ -122,6 +122,10 @@ class MemberModel {
     });
   }
 
+  public static getModel() {
+    return this.model;
+  }
+
 }
 
 export { MemberModel };

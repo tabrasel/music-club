@@ -16,14 +16,14 @@ AlbumModel.setup();
 RoundModel.setup();
 
 // Get all rounds
-RoundModel.model.find({}, (err: any, allRounds: any) => {
+RoundModel.getModel().find({}, (err: any, allRounds: any) => {
 
   for (const round of allRounds) {
     if (round.participantIds.length !== 0) continue;
 
     // Get promises to load each round
     const albumPromises: any[] = round.albumIds.map((albumId: string) => {
-      return AlbumModel.model.findOne({ id: albumId }, (err2: any, album: any) => {
+      return AlbumModel.getModel().findOne({ id: albumId }, (err2: any, album: any) => {
         Promise.resolve(album);
       });
     });
@@ -32,7 +32,7 @@ RoundModel.model.find({}, (err: any, allRounds: any) => {
     Promise.all(albumPromises).then((albums: any[]) => {
       const filter: any = { id: round.id };
       const updatedData: any = { participantIds: albums.map((album: any) => album.posterId) };
-      RoundModel.model.findOneAndUpdate(filter, updatedData, { new: true, useFindAndModify: false, strict: false }).exec();
+      RoundModel.getModel().findOneAndUpdate(filter, updatedData, { new: true, useFindAndModify: false, strict: false }).exec();
     });
   }
 

@@ -122,6 +122,10 @@ class AlbumModel {
     });
   }
 
+  public static getModel() {
+    return this.model;
+  }
+
 }
 
 export { AlbumModel };

@@ -125,6 +125,10 @@ class RoundModel {
     });
   }
 
+  public static getModel() {
+    return this.model;
+  }
+
 }
 
 export { RoundModel };
