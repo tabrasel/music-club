@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface IRound {
   id: string,
   number: number,
+  description: string,
   participantIds: string[],
   albumIds: string[],
   startDate: string,
@@ -24,6 +25,7 @@ class RoundModel {
       {
         id: String,
         number: Number,
+        description: String,
         participantIds: [String],
         albumIds: [String],
         startDate: String,
@@ -43,9 +45,11 @@ class RoundModel {
   public static createRound(req: any, res: Response): void {
     // Define a document for the round
     const roundInfo = req.body;
+
     const roundDoc: IRound = {
       id: uuidv4(),
       number: roundInfo.number,
+      description: roundInfo.description,
       participantIds: roundInfo.participantIds,
       albumIds: [],
       startDate: roundInfo.startDate,
