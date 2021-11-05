@@ -3,7 +3,7 @@ import express, { Response } from 'express';
 import mongoose, { Document, NativeError, Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define album interface
+// Define member interface
 interface IMember {
   id: string,
   firstName: string,
