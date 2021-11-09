@@ -9,7 +9,8 @@
     "prestart": "npm run build",
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setRoundParticipantIds": "node dist/setRoundParticipantIds.js"
+    "setRoundParticipantIds": "node dist/setRoundParticipantIds.js",
+    "generateRoundThumbnails": "node dist/generateRoundThumbnails.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/tabrasel/music-club#readme",
   "dependencies": {
+    "canvas": "^2.8.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.13.2",
