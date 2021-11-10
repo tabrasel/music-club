@@ -3,15 +3,7 @@ import express, { Response } from 'express';
 import mongoose, { Document, NativeError, Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define album interface
-interface IMember {
-  id: string,
-  firstName: string,
-  lastName: string,
-  color: string,
-  participatedRoundIds: string[],
-  postedAlbumIds: string[],
-}
+import IMember from '../interfaces/IMember';
 
 class MemberModel {
 

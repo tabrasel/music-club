@@ -3,17 +3,7 @@ import express, { Response } from 'express';
 import mongoose, { Document, Model, NativeError, Schema, model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define round interface
-interface IRound {
-  id: string,
-  number: number,
-  description: string,
-  participantIds: string[],
-  albumIds: string[],
-  startDate: string,
-  endDate: string,
-  picksPerParticipant: number
-}
+import IRound from '../interfaces/IRound';
 
 class RoundModel {
 

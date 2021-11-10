@@ -9,24 +9,21 @@ import RoundThumbnailGenerator from '../RoundThumbnailGenerator';
 
 import { Database } from '../Database';
 
-// Import models
-import { AlbumModel } from '../models/AlbumModel';
-import { MemberModel } from '../models/MemberModel';
+import IRound from '../interfaces/IRound';
+
 import { RoundModel } from '../models/RoundModel';
 
 // Connect to database
 Database.connect();
 
 // Set up models
-AlbumModel.setup();
-MemberModel.setup();
 RoundModel.setup();
 
 RoundThumbnailGenerator.setup();
 
-RoundModel.getModel().find({}, async (err: any, rounds: any) => {
+RoundModel.getModel().find({}, async (err: any, rounds: IRound[]) => {
 
-  const updatePromises = rounds.map(async (round: any) => {
+  const updatePromises = rounds.map(async (round: IRound) => {
     // Generate thumbnail image file
     const thumbnailPath = await RoundThumbnailGenerator.generate(round, 400);
 
@@ -37,7 +34,7 @@ RoundModel.getModel().find({}, async (err: any, rounds: any) => {
 
     // TODO: Delete thumbnail image file
 
-    return Promise.resolve(true);
+    return Promise.resolve();
   });
 
   // Wait for all updates to process
