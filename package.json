@@ -9,8 +9,8 @@
     "prestart": "npm run build",
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setRoundParticipantIds": "node dist/setRoundParticipantIds.js",
-    "generateRoundThumbnails": "node dist/generateRoundThumbnails.js"
+    "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
+    "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
   },
   "repository": {
     "type": "git",

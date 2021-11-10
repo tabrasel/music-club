@@ -2,11 +2,11 @@
   Sets each round's particpantIds by using album poster IDs.
 */
 
-import { Database } from './Database';
+import { Database } from '../Database';
 
 // Import models
-import { AlbumModel } from './models/AlbumModel';
-import { RoundModel } from './models/RoundModel';
+import { AlbumModel } from '../models/AlbumModel';
+import { RoundModel } from '../models/RoundModel';
 
 // Connect to database
 Database.connect();

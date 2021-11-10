@@ -10,7 +10,7 @@ class RoundThumbnailGenerator {
     registerFont('./src/Poppins-ExtraLight.ttf', { family: 'Poppins' });
   }
 
-  public static async generateThumbnail(round: any, size: number): Promise<string> {
+  public static async generate(round: any, size: number): Promise<string> {
     // Define thumbnail dimensions and layout
     const gap: number = size * 0.04;
     const albumSize: number = (size - gap * 3) / 2;
