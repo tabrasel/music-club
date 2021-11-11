@@ -6,11 +6,13 @@ import { Database } from './Database';
 
 // Import models
 import { AlbumModel } from './models/AlbumModel';
+import { ClubModel } from './models/ClubModel';
 import { MemberModel } from './models/MemberModel';
 import { RoundModel } from './models/RoundModel';
 
 // Import routes
 import albumRoutes from './routes/album_routes';
+import clubRoutes from './routes/club_routes';
 import memberRoutes from './routes/member_routes';
 import roundRoutes from './routes/round_routes';
 
@@ -19,6 +21,7 @@ Database.connect();
 
 // Set up models
 AlbumModel.setup();
+ClubModel.setup();
 MemberModel.setup();
 RoundModel.setup();
 
@@ -32,6 +35,7 @@ expressApp.use(express.urlencoded({ extended: true }));
 
 // Add routes to server
 expressApp.use(albumRoutes);
+expressApp.use(clubRoutes);
 expressApp.use(memberRoutes);
 expressApp.use(roundRoutes);
 

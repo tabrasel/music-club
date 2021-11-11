@@ -23,7 +23,7 @@ router.delete('/api/round', (req: any, res: Response) => {
 
 // Get a round
 router.get('/api/round', (req: any, res: Response) => {
-  if ('id' in req.query || 'number' in req.query) {
+  if ('id' in req.query) {
     return RoundModel.getRound(req, res);
   }
 
