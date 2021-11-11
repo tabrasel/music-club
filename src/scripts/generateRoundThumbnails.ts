@@ -11,12 +11,14 @@ import { Database } from '../Database';
 
 import IRound from '../interfaces/IRound';
 
+import { AlbumModel } from '../models/AlbumModel';
 import { RoundModel } from '../models/RoundModel';
 
 // Connect to database
 Database.connect();
 
 // Set up models
+AlbumModel.setup();
 RoundModel.setup();
 
 RoundThumbnailGenerator.setup();

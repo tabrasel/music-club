@@ -35,6 +35,9 @@ expressApp.use(albumRoutes);
 expressApp.use(memberRoutes);
 expressApp.use(roundRoutes);
 
+// Serve public files
+expressApp.use(express.static('public'));
+
 // Have server listen for requests
 expressApp.listen(process.env.PORT || 80);
 

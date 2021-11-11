@@ -58,7 +58,7 @@ class RoundThumbnailGenerator {
     context.fillText('' + round.number, size / 2, size / 2 + textHeight / 2);
 
     // Save thumbnail image file
-    const filepath: string = './thumbnail_' + round.id + '.jpeg';
+    const filepath: string = './round_thumbnails/' + round.id + '.jpeg';
     const buffer = canvas.toBuffer('image/jpeg');
     fs.writeFileSync(filepath, buffer);
 
