@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import IRound from '../interfaces/IRound';
 
+import RoundThumbnailGenerator from '../RoundThumbnailGenerator';
+
 class RoundModel {
 
   private static model: Model<IRound>;
@@ -55,6 +57,8 @@ class RoundModel {
         res.json(round);
       }
     });
+
+    RoundThumbnailGenerator.generate(roundDoc, 400);
   }
 
   /**
@@ -62,15 +66,18 @@ class RoundModel {
    */
   public static updateRound(req: any, res: Response): any {
     const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
 
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
+    // Regenerate thumbnail
+    this.model.findOne(filter).exec((err: NativeError, round: any) => {
+      RoundThumbnailGenerator.generate(round, 400);
+    });
 
-    query.exec((err: NativeError, updatedRound) => {
+    // Set up update query
+    const update: any = req.body;
+    const updateQuery = this.model.findOneAndUpdate(filter, update, { new: true, useFindAndModify: false });
+
+    // Execute update query
+    updateQuery.exec((err: NativeError, updatedRound) => {
       if (err) {
         res.json("Failed to update round");
       } else {
