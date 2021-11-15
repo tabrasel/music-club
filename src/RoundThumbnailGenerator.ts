@@ -65,6 +65,15 @@ class RoundThumbnailGenerator {
     return Promise.resolve(filepath);
   }
 
+  public static delete(round: any) {
+    // Delete thumbnail image file
+    const filepath: string = './public/round_thumbnails/' + round.id + '.jpeg';
+    fs.unlink(filepath, (err) => {
+      // tslint:disable-next-line:no-console
+      console.log(err);
+    });
+  }
+
   private static async fetchAlbumImages(round: any): Promise<any[]> {
     // Fetch albums
     const albumPromises: any[] = round.albumIds.map((albumId: string) => {
