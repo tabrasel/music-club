@@ -54,11 +54,12 @@ class RoundModel {
       if (err) {
         res.json("Failed to create round");
       } else {
+        // Generate thumbnail
+        RoundThumbnailGenerator.generate(roundDoc, 400);
+
         res.json(round);
       }
     });
-
-    RoundThumbnailGenerator.generate(roundDoc, 400);
   }
 
   /**
@@ -67,20 +68,18 @@ class RoundModel {
   public static updateRound(req: any, res: Response): any {
     const filter: any = { id: req.query.id };
 
-    // Regenerate thumbnail
-    this.model.findOne(filter).exec((err: NativeError, round: any) => {
-      RoundThumbnailGenerator.generate(round, 400);
-    });
-
-    // Set up update query
+    // Define and execute update query
     const update: any = req.body;
     const updateQuery = this.model.findOneAndUpdate(filter, update, { new: true, useFindAndModify: false });
-
-    // Execute update query
-    updateQuery.exec((err: NativeError, updatedRound) => {
-      if (err) {
+    updateQuery.exec((updateError: NativeError, updatedRound) => {
+      if (updateError) {
         res.json("Failed to update round");
       } else {
+        // Regenerate thumbnail
+        this.model.findOne(filter).exec((err: NativeError, round: any) => {
+          RoundThumbnailGenerator.generate(round, 400);
+        });
+
         res.json(updatedRound);
       }
     });
@@ -90,13 +89,20 @@ class RoundModel {
    * Delete an existing round.
    */
   public static deleteRound(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
+    const filter: any = { id: req.query.id };
 
-    query.exec((err: NativeError, round: Document) => {
-      if (err) {
+    // Define and execute delete query
+    const deleteQuery: any = this.model.findOneAndDelete(filter);
+    deleteQuery.exec((deleteError: NativeError, deletedRound: Document) => {
+      if (deleteError) {
         res.json("Failed to delete round");
       } else {
-        res.json(round);
+        // Delete thumbnail
+        this.model.findOne(filter).exec((getError: NativeError, round: any) => {
+          RoundThumbnailGenerator.delete(round);
+        });
+
+        res.json(deletedRound);
       }
     });
   }
