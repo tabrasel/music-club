@@ -1,15 +1,16 @@
 {
   "name": "music-club",
   "version": "1.1.0",
-  "description": "An editor for tracking music club activity",
+  "description": "Music Club backend service",
   "main": "dist/server.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
-    "prestart": "npm run build",
+    "prestart": "npm run build && npm run generateRoundThumbnails",
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setRoundParticipantIds": "node dist/setRoundParticipantIds.js"
+    "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
+    "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/tabrasel/music-club#readme",
   "dependencies": {
+    "canvas": "^2.8.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.13.2",

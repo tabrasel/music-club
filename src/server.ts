@@ -10,6 +10,8 @@ import { ClubModel } from './models/ClubModel';
 import { MemberModel } from './models/MemberModel';
 import { RoundModel } from './models/RoundModel';
 
+import RoundThumbnailGenerator from './RoundThumbnailGenerator';
+
 // Import routes
 import albumRoutes from './routes/album_routes';
 import clubRoutes from './routes/club_routes';
@@ -25,6 +27,8 @@ ClubModel.setup();
 MemberModel.setup();
 RoundModel.setup();
 
+RoundThumbnailGenerator.setup();
+
 // Define Express server
 const expressApp: Application = express();
 
@@ -38,6 +42,9 @@ expressApp.use(albumRoutes);
 expressApp.use(clubRoutes);
 expressApp.use(memberRoutes);
 expressApp.use(roundRoutes);
+
+// Serve public files
+expressApp.use(express.static('public'));
 
 // Have server listen for requests
 expressApp.listen(process.env.PORT || 80);

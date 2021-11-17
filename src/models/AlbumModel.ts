@@ -3,21 +3,7 @@ import express, { Response } from 'express';
 import mongoose, { Document, NativeError, Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define album interface
-interface IAlbum {
-  id: string,
-  title: string,
-  artist: string,
-  trackCount: number,
-  imageUrl: string,
-  posterId: string,
-  pickedTracks: {
-    title: string,
-    trackNumber: number,
-    pickerIds: string[]
-  }[],
-  topTrackNumber: number
-}
+import IAlbum from '../interfaces/IAlbum';
 
 class AlbumModel {
 
