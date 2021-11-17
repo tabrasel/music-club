@@ -23,6 +23,12 @@ RoundModel.setup();
 
 RoundThumbnailGenerator.setup();
 
+// Delete all pre-existing round thumbnails
+fs.readdirSync('./public/round_thumbnails').forEach((filename: string) => {
+  const filepath: string = './public/round_thumbnails/' + filename;
+  fs.unlinkSync(filepath);
+});
+
 RoundModel.getModel().find({}, async (err: any, rounds: IRound[]) => {
 
   const updatePromises = rounds.map(async (round: IRound) => {
