@@ -48,9 +48,6 @@ expressApp.get('/', (req, res) => {
   res.send('Hello! API is available at api/');
 });
 
-// Serve public files
-expressApp.use(express.static(path.join(__dirname, '..', 'public')));
-
 // Have server listen for requests
 expressApp.listen(process.env.PORT || 80);
 
