@@ -2,9 +2,7 @@
  * Generates a thumbnail image for each round.
  */
 
-import { uploadImageBuffer } from '../S3';
-
-import RoundThumbnailGenerator from '../RoundThumbnailGenerator';
+import RoundThumbnailManager from '../RoundThumbnailManager';
 
 import { Database } from '../Database';
 
@@ -18,7 +16,7 @@ Database.connect();
 // Set up models
 RoundModel.setup();
 
-RoundThumbnailGenerator.setup();
+RoundThumbnailManager.setup();
 
 RoundModel.getModel().find({}, async (err: any, rounds: IRound[]) => {
 
@@ -26,11 +24,10 @@ RoundModel.getModel().find({}, async (err: any, rounds: IRound[]) => {
 
     try {
       // Generate thumbnail
-      const imgBuffer = await RoundThumbnailGenerator.generate(round, 400);
+      const imgBuffer = await RoundThumbnailManager.generateThumbnail(round, 400);
 
       // Store thumbnail
-      const key: string = 'round_thumbnails/' + round.id + '.jpeg';
-      await uploadImageBuffer(imgBuffer, key, 'image/jpeg');
+      await RoundThumbnailManager.storeThumbnail(imgBuffer, round.id);
     } catch(err) {
       // tslint:disable-next-line:no-console
       console.log(err);

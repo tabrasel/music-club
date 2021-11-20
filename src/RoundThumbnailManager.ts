@@ -1,18 +1,33 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: './.env'});
 
-// Import models
+import { createCanvas, loadImage, registerFont } from 'canvas';
+
+import S3 from 'aws-sdk/clients/s3';
+
 import { AlbumModel } from './models/AlbumModel';
+
+// S3 bucket info for storing round thumbnails
+const bucketName = process.env.AWS_BUCKET_NAME;
+const bucketRegion = process.env.AWS_BUCKET_REGION;
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+const s3 = new S3({
+  accessKeyId,
+  secretAccessKey,
+  region: bucketRegion
+});
 
 AlbumModel.setup();
 
-class RoundThumbnailGenerator {
+class RoundThumbnailManager {
 
   public static setup() {
     registerFont('./src/Poppins-ExtraLight.ttf', { family: 'Poppins' });
   }
 
-  public static async generate(round: any, size: number): Promise<Buffer> {
+  public static async generateThumbnail(round: any, size: number): Promise<Buffer> {
     // Define thumbnail dimensions and layout
     const gap: number = size * 0.04;
     const albumSize: number = (size - gap * 3) / 2;
@@ -59,10 +74,30 @@ class RoundThumbnailGenerator {
     const textHeight  = textMetrics.actualBoundingBoxAscent - textMetrics.actualBoundingBoxDescent;
     context.fillText('' + round.number, size / 2, size / 2 + textHeight / 2);
 
-    // Save thumbnail image file
+    // Convert canvas to image buffer
     const imgBuffer = canvas.toBuffer('image/jpeg');
 
     return Promise.resolve(imgBuffer);
+  }
+
+  public static storeThumbnail(imgBuffer: any, roundId: string) {
+    const params = {
+      Bucket: bucketName,
+      Body: imgBuffer,
+      Key: 'round_thumbnails/' + roundId + '.jpeg',
+      ContentType: 'image/jpeg'
+    };
+
+    return s3.upload(params).promise();
+  }
+
+  public static deleteThumbnail(roundId: string) {
+    const params = {
+      Bucket: bucketName,
+      Key: 'round_thumbnails/' + roundId + '.jpeg',
+    };
+
+    return s3.deleteObject(params).promise();
   }
 
   private static async fetchAlbumImages(round: any): Promise<any[]> {
@@ -82,4 +117,4 @@ class RoundThumbnailGenerator {
 
 }
 
-export default RoundThumbnailGenerator;
+export default RoundThumbnailManager;
