@@ -4,13 +4,15 @@ import * as fs from 'fs';
 // Import models
 import { AlbumModel } from './models/AlbumModel';
 
+AlbumModel.setup();
+
 class RoundThumbnailGenerator {
 
   public static setup() {
     registerFont('./src/Poppins-ExtraLight.ttf', { family: 'Poppins' });
   }
 
-  public static async generate(round: any, size: number): Promise<string> {
+  public static async generate(round: any, size: number): Promise<Buffer> {
     // Define thumbnail dimensions and layout
     const gap: number = size * 0.04;
     const albumSize: number = (size - gap * 3) / 2;
@@ -58,20 +60,9 @@ class RoundThumbnailGenerator {
     context.fillText('' + round.number, size / 2, size / 2 + textHeight / 2);
 
     // Save thumbnail image file
-    const filepath: string = './public/round_thumbnails/' + round.id + '.jpeg';
-    const buffer = canvas.toBuffer('image/jpeg');
-    fs.writeFileSync(filepath, buffer);
+    const imgBuffer = canvas.toBuffer('image/jpeg');
 
-    return Promise.resolve(filepath);
-  }
-
-  public static delete(round: any) {
-    // Delete thumbnail image file
-    const filepath: string = './public/round_thumbnails/' + round.id + '.jpeg';
-    fs.unlink(filepath, (err) => {
-      // tslint:disable-next-line:no-console
-      console.log(err);
-    });
+    return Promise.resolve(imgBuffer);
   }
 
   private static async fetchAlbumImages(round: any): Promise<any[]> {
