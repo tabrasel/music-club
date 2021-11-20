@@ -98,9 +98,11 @@ class RoundModel {
         res.json("Failed to delete round");
       } else {
         // Delete thumbnail
+        /*
         this.model.findOne(filter).exec((getError: NativeError, round: any) => {
           RoundThumbnailGenerator.delete(round);
         });
+        */
 
         res.json(deletedRound);
       }
