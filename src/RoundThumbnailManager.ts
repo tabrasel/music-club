@@ -19,8 +19,6 @@ const s3 = new S3({
   region: bucketRegion
 });
 
-AlbumModel.setup();
-
 class RoundThumbnailManager {
 
   public static setup() {
