@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import IRound from '../interfaces/IRound';
 
-import RoundThumbnailGenerator from '../RoundThumbnailGenerator';
+import RoundThumbnailManager from '../RoundThumbnailManager';
 
 class RoundModel {
 
@@ -55,7 +55,7 @@ class RoundModel {
         res.json("Failed to create round");
       } else {
         // Generate thumbnail
-        RoundThumbnailGenerator.generate(roundDoc, 400);
+        RoundThumbnailManager.generateThumbnail(roundDoc, 400);
 
         res.json(round);
       }
@@ -77,7 +77,7 @@ class RoundModel {
       } else {
         // Regenerate thumbnail
         this.model.findOne(filter).exec((err: NativeError, round: any) => {
-          RoundThumbnailGenerator.generate(round, 400);
+          RoundThumbnailManager.generateThumbnail(round, 400);
         });
 
         res.json(updatedRound);
@@ -99,7 +99,7 @@ class RoundModel {
       } else {
         // Delete thumbnail
         this.model.findOne(filter).exec((getError: NativeError, round: any) => {
-          RoundThumbnailGenerator.delete(round);
+          RoundThumbnailManager.deleteThumbnail(round.id);
         });
 
         res.json(deletedRound);

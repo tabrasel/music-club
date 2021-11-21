@@ -11,7 +11,7 @@ import { ClubModel } from './models/ClubModel';
 import { MemberModel } from './models/MemberModel';
 import { RoundModel } from './models/RoundModel';
 
-import RoundThumbnailGenerator from './RoundThumbnailGenerator';
+import RoundThumbnailManager from './RoundThumbnailManager';
 
 // Import routes
 import albumRoutes from './routes/album_routes';
@@ -28,7 +28,7 @@ ClubModel.setup();
 MemberModel.setup();
 RoundModel.setup();
 
-RoundThumbnailGenerator.setup();
+RoundThumbnailManager.setup();
 
 // Define Express server
 const expressApp: Application = express();
@@ -47,9 +47,6 @@ expressApp.use(roundRoutes);
 expressApp.get('/', (req, res) => {
   res.send('Hello! API is available at api/');
 });
-
-// Serve public files
-expressApp.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Have server listen for requests
 expressApp.listen(process.env.PORT || 80);
