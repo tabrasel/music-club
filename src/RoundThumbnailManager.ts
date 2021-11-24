@@ -25,7 +25,7 @@ class RoundThumbnailManager {
     registerFont('./src/Poppins-ExtraLight.ttf', { family: 'Poppins' });
   }
 
-  public static async generateThumbnail(round: any, size: number): Promise<Buffer> {
+  public static async generateThumbnail(round: any, size: number): Promise<string> {
     // Define thumbnail dimensions and layout
     const gap: number = size * 0.04;
     const albumSize: number = (size - gap * 3) / 2;
@@ -75,10 +75,13 @@ class RoundThumbnailManager {
     // Convert canvas to image buffer
     const imgBuffer = canvas.toBuffer('image/jpeg');
 
+    // Store thumbnail image
+    await this.storeThumbnail(imgBuffer, round.id);
+
     return Promise.resolve(imgBuffer);
   }
 
-  public static storeThumbnail(imgBuffer: any, roundId: string) {
+  private static storeThumbnail(imgBuffer: any, roundId: string): Promise<any> {
     const params = {
       Bucket: bucketName,
       Body: imgBuffer,

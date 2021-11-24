@@ -24,10 +24,7 @@ RoundModel.getModel().find({}, async (err: any, rounds: IRound[]) => {
 
     try {
       // Generate thumbnail
-      const imgBuffer = await RoundThumbnailManager.generateThumbnail(round, 400);
-
-      // Store thumbnail
-      await RoundThumbnailManager.storeThumbnail(imgBuffer, round.id);
+      await RoundThumbnailManager.generateThumbnail(round, 400);
     } catch(err) {
       // tslint:disable-next-line:no-console
       console.log(err);
