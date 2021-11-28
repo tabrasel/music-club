@@ -37,12 +37,12 @@ class RoundModel {
   /**
    * Create a new round document.
    */
-  public static createRound(req: any, res: Response): void {
+  public static async createRound(req: any, res: Response): Promise<void> {
     // Define a document for the round
     const roundInfo = req.body;
 
     // Sort participants
-    roundInfo.participantIds = MemberModel.sortMemberIds(roundInfo.participantIds);
+    roundInfo.participantIds = await MemberModel.sortMemberIds(roundInfo.participantIds);
 
     const roundDoc: IRound = {
       id: uuidv4(),
