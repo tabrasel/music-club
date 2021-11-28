@@ -3,7 +3,10 @@ import express, { Response } from 'express';
 import mongoose, { Document, Model, NativeError, Schema, model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
+import IMember from '../interfaces/IMember';
 import IRound from '../interfaces/IRound';
+
+import { MemberModel } from './MemberModel';
 
 import RoundThumbnailManager from '../RoundThumbnailManager';
 
@@ -37,6 +40,9 @@ class RoundModel {
   public static createRound(req: any, res: Response): void {
     // Define a document for the round
     const roundInfo = req.body;
+
+    // Sort participants
+    roundInfo.participantIds = MemberModel.sortMemberIds(roundInfo.participantIds);
 
     const roundDoc: IRound = {
       id: uuidv4(),
