@@ -10,6 +10,7 @@
     "start": "node .",
     "test": "jest",
     "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
+    "sortRoundParticipants": "node dist/scripts/sortRoundParticipants.js",
     "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
   },
   "repository": {
