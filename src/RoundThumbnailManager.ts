@@ -25,7 +25,7 @@ class RoundThumbnailManager {
     registerFont('./src/Poppins-ExtraLight.ttf', { family: 'Poppins' });
   }
 
-  public static async generateThumbnail(round: any, size: number): Promise<Buffer> {
+  public static async generateThumbnail(round: any, size: number): Promise<any> {
     // Define thumbnail dimensions and layout
     const gap: number = size * 0.04;
     const albumSize: number = (size - gap * 3) / 2;
@@ -75,18 +75,14 @@ class RoundThumbnailManager {
     // Convert canvas to image buffer
     const imgBuffer = canvas.toBuffer('image/jpeg');
 
-    return Promise.resolve(imgBuffer);
-  }
-
-  public static storeThumbnail(imgBuffer: any, roundId: string) {
-    const params = {
+    const uploadParams = {
       Bucket: bucketName,
       Body: imgBuffer,
-      Key: 'round_thumbnails/' + roundId + '.jpeg',
+      Key: 'round_thumbnails/' + round.id + '.jpeg',
       ContentType: 'image/jpeg'
     };
 
-    return s3.upload(params).promise();
+    return s3.upload(uploadParams).promise();
   }
 
   public static deleteThumbnail(roundId: string) {

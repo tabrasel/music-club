@@ -3,7 +3,10 @@ import express, { Response } from 'express';
 import mongoose, { Document, Model, NativeError, Schema, model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
+import IMember from '../interfaces/IMember';
 import IRound from '../interfaces/IRound';
+
+import { MemberModel } from './MemberModel';
 
 import RoundThumbnailManager from '../RoundThumbnailManager';
 
@@ -34,9 +37,12 @@ class RoundModel {
   /**
    * Create a new round document.
    */
-  public static createRound(req: any, res: Response): void {
+  public static async createRound(req: any, res: Response): Promise<void> {
     // Define a document for the round
     const roundInfo = req.body;
+
+    // Sort participants
+    roundInfo.participantIds = await MemberModel.sortMemberIds(roundInfo.participantIds);
 
     const roundDoc: IRound = {
       id: uuidv4(),
@@ -76,9 +82,7 @@ class RoundModel {
         res.json("Failed to update round");
       } else {
         // Regenerate thumbnail
-        this.model.findOne(filter).exec((err: NativeError, round: any) => {
-          RoundThumbnailManager.generateThumbnail(round, 400);
-        });
+        RoundThumbnailManager.generateThumbnail(updatedRound, 400);
 
         res.json(updatedRound);
       }
@@ -98,9 +102,7 @@ class RoundModel {
         res.json("Failed to delete round");
       } else {
         // Delete thumbnail
-        this.model.findOne(filter).exec((getError: NativeError, round: any) => {
-          RoundThumbnailManager.deleteThumbnail(round.id);
-        });
+        RoundThumbnailManager.deleteThumbnail(deletedRound.id);
 
         res.json(deletedRound);
       }

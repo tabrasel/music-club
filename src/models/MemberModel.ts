@@ -118,6 +118,28 @@ class MemberModel {
     return this.model;
   }
 
+  public static async sortMemberIds(memberIds: string[]): Promise<any> {
+    // Get members
+    const query = this.model.find({ 'id': { $in: memberIds } });
+    const members: IMember[] = await query.exec();
+
+    // Sort members by name
+    members.sort((a: IMember, b: IMember) => this.compareMembers(a, b));
+
+    // Map sorted members back to member IDs
+    const sortedMemberIds: string[] = members.map((m: IMember) => m.id);
+
+    return sortedMemberIds;
+  }
+
+  private static compareMembers(a: IMember, b: IMember): number {
+    if (a.lastName < b.lastName)
+      return -1;
+    else if (a.lastName > b.lastName)
+      return 1;
+    return a.firstName < b.firstName ? -1 : 1;
+  }
+
 }
 
 export { MemberModel };
