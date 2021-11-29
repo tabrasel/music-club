@@ -82,9 +82,7 @@ class RoundModel {
         res.json("Failed to update round");
       } else {
         // Regenerate thumbnail
-        this.model.findOne(filter).exec((err: NativeError, round: any) => {
-          RoundThumbnailManager.generateThumbnail(round, 400);
-        });
+        RoundThumbnailManager.generateThumbnail(updatedRound, 400);
 
         res.json(updatedRound);
       }
@@ -104,9 +102,7 @@ class RoundModel {
         res.json("Failed to delete round");
       } else {
         // Delete thumbnail
-        this.model.findOne(filter).exec((getError: NativeError, round: any) => {
-          RoundThumbnailManager.deleteThumbnail(round.id);
-        });
+        RoundThumbnailManager.deleteThumbnail(deletedRound.id);
 
         res.json(deletedRound);
       }
