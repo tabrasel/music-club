@@ -10,6 +10,7 @@
     "start": "node .",
     "test": "jest",
     "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
+    "sortRoundParticipants": "node dist/scripts/sortRoundParticipants.js",
     "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
   },
   "repository": {
@@ -28,7 +29,7 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "mongoose": "^5.13.2",
+    "mongoose": "^6.0.13",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
