@@ -32,7 +32,7 @@ class RoundThumbnailManager {
     const labelSize: number = size * 0.125;
 
     // Load album images
-    const albumImgs = await this.fetchAlbumImages(round);
+    const albumImgs = await this.fetchRoundAlbumImages(round);
 
     // Create canvas and context
     const canvas = createCanvas(size, size);
@@ -94,12 +94,14 @@ class RoundThumbnailManager {
     return s3.deleteObject(params).promise();
   }
 
-  private static async fetchAlbumImages(round: any): Promise<any[]> {
-    // Fetch albums
-    const albumPromises: any[] = round.albumIds.map((albumId: string) => {
-      return AlbumModel.getModel().findOne({ id: albumId }, (err: any, album: any) => Promise.resolve(album));
+  private static async fetchRoundAlbumImages(round: any): Promise<any[]> {
+    // Fetch round albums
+    const albums = await AlbumModel.getModel().find({ 'id': { $in: round.albumIds }}).exec();
+
+    // Sort the albums in the order of albumIds
+    albums.sort((a: any, b: any) => {
+      return round.albumIds.indexOf(a.id) - round.albumIds.indexOf(b.id);
     });
-    const albums: any[] = await Promise.all(albumPromises);
 
     // Fetch album images
     const albumImgPromises = albums.map((album: any) => {
