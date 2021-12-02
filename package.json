@@ -11,6 +11,7 @@
     "test": "jest",
     "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
     "sortRoundParticipants": "node dist/scripts/sortRoundParticipants.js",
+    "sortRoundAlbums": "node dist/scripts/sortRoundAlbums.js",
     "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
   },
   "repository": {
