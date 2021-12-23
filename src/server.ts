@@ -17,6 +17,7 @@ import RoundThumbnailManager from './RoundThumbnailManager';
 import albumRoutes from './routes/album_routes';
 import clubRoutes from './routes/club_routes';
 import memberRoutes from './routes/member_routes';
+import memberMatchRoutes from './routes/member_match_routes';
 import roundRoutes from './routes/round_routes';
 
 // Connect to database
@@ -42,6 +43,7 @@ expressApp.use(express.urlencoded({ extended: true }));
 expressApp.use(albumRoutes);
 expressApp.use(clubRoutes);
 expressApp.use(memberRoutes);
+expressApp.use(memberMatchRoutes);
 expressApp.use(roundRoutes);
 
 expressApp.get('/', (req, res) => {
