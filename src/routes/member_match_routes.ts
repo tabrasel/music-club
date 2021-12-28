@@ -17,30 +17,34 @@ const router: Router = Router();
 // TODO: /api/shared-votes (requires memberId, then otherMemberId or clubId)
 // TODO: /api/shared-rounds (requires memberId, then otherMemberId or clubId)
 
-// Get a member's match
-router.get('/api/member-match', (req: any, res: Response) => {
-  if ('memberId' in req.query && 'clubId' in req.query) {
-    return getClubMemberMatches(req.query.memberId, req.query.clubId, res);
+router.get('/api/shared-votes', async (req: any, res: Response) => {
+  // Check arguments
+  if (!('memberId' in req.query && 'clubId' in req.query)) {
+    res.status(400);
+    res.json('Missing one or more required parameters: [memberId], [clubId]');
+    return;
   }
 
-  res.status(400);
-  res.json('Missing one or more required args: [memberId], [clubId]');
+  const sharedVotes: any[] = await countSharedClubVotes(req.query.memberId, req.query.clubId);
+  res.json(sharedVotes);
 });
 
 /**
- * Count the number of votes shared between a given club member and each other member
+ * Count the number of votes shared between a given member and each other member of a club.
+ * @param memberId ID of the member to match against
+ * @param clubId   ID of the club with members to match against
  */
-async function getClubMemberMatches(memberId: string, clubId: string, res: Response): Promise<any> {
+async function countSharedClubVotes(memberId: string, clubId: string): Promise<any[]> {
   // Fetch club
   const club: any = await ClubModel.getModel().findOne({ 'id': clubId }).exec();
 
-  // Initialize vote matches
-  const voteMatchMap = new Map<string, number>();
-  club.participantIds.forEach((id: string) => { if (id !== memberId) voteMatchMap.set(id, 0); });
+  // Initialize shared votes counts
+  const sharedVotesMap = new Map<string, number>();
+  club.participantIds.forEach((id: string) => { if (id !== memberId) sharedVotesMap.set(id, 0); });
 
-  // Initialize round matches
-  const roundMatchMap = new Map<string, number>();
-  club.participantIds.forEach((id: string) => { if (id !== memberId) roundMatchMap.set(id, 0); });
+  // Initialize shared rounds counts
+  const sharedRoundsMap = new Map<string, number>();
+  club.participantIds.forEach((id: string) => { if (id !== memberId) sharedRoundsMap.set(id, 0); });
 
   // Count how many votes the given member shares with every other club member
   const member: IMember = await MemberModel.getModel().findOne({ 'id': memberId });
@@ -49,37 +53,37 @@ async function getClubMemberMatches(memberId: string, clubId: string, res: Respo
   for (const round of participatedRounds) {
     const albums: IAlbum[] = await AlbumModel.getModel().find({ 'id': { $in: round.albumIds } });
 
-    // Update the number of shared rounds with each participant
+    // Increment the number of rounds shared with each other member
     round.participantIds.forEach((id: string) => {
-      if (roundMatchMap.has(id)) roundMatchMap.set(id, roundMatchMap.get(id) + 1)
+      if (sharedRoundsMap.has(id)) sharedRoundsMap.set(id, sharedRoundsMap.get(id) + 1)
     });
 
     for (const album of albums) {
       for (const pickedTrack of album.pickedTracks) {
         if (!pickedTrack.pickerIds.includes(memberId)) continue;
         for (const pickerId of pickedTrack.pickerIds) {
-          if (pickerId !== memberId) voteMatchMap.set(pickerId, voteMatchMap.get(pickerId) + 1);
+          if (pickerId !== memberId) sharedVotesMap.set(pickerId, sharedVotesMap.get(pickerId) + 1);
         }
       }
     }
   }
 
-  // If a member never participated in a round with the given member, set their matched vote count to -1
-  roundMatchMap.forEach((count: number, id: string) => { if (count === 0) voteMatchMap.set(id, -1) });
+  // If a member never participated in a round with the given member, set their shared votes count to -1
+  sharedRoundsMap.forEach((count: number, id: string) => { if (count === 0) sharedVotesMap.set(id, -1) });
 
-  // Convert map to array
-  const voteMatches: any[] = Array.from(voteMatchMap, ([id, count]) => ({ 'member': id, 'matchCount': count }));
+  // Convert shared votes map to array
+  const sharedVotes: any[] = Array.from(sharedVotesMap, ([id, count]) => ({ 'member': id, 'matchCount': count }));
 
   // Include all member info
   const members: IMember[] = await MemberModel.getModel().find({ 'id': { $in: club.participantIds } });
   const memberMap = new Map<string, IMember>();
   members.forEach((m: IMember) => { memberMap.set(m.id, m) });
-  voteMatches.forEach((voteMatch) => { voteMatch.member = memberMap.get(voteMatch.member); });
+  sharedVotes.forEach((voteMatch) => { voteMatch.member = memberMap.get(voteMatch.member); });
 
-  // Sort by descending match count
-  voteMatches.sort((a: any, b: any) => b.matchCount - a.matchCount);
+  // Sort by descending shared votes count
+  sharedVotes.sort((a: any, b: any) => b.matchCount - a.matchCount);
 
-  res.json(voteMatches);
+  return sharedVotes;
 }
 
 export default router;
