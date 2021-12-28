@@ -72,7 +72,7 @@ async function countSharedClubVotes(memberId: string, clubId: string): Promise<a
   sharedRoundsMap.forEach((count: number, id: string) => { if (count === 0) sharedVotesMap.set(id, -1) });
 
   // Convert shared votes map to array
-  const sharedVotes: any[] = Array.from(sharedVotesMap, ([id, count]) => ({ 'member': id, 'matchCount': count }));
+  const sharedVotes: any[] = Array.from(sharedVotesMap, ([id, count]) => ({ 'member': id, 'sharedVotesCount': count }));
 
   // Include all member info
   const members: IMember[] = await MemberModel.getModel().find({ 'id': { $in: club.participantIds } });
@@ -81,7 +81,7 @@ async function countSharedClubVotes(memberId: string, clubId: string): Promise<a
   sharedVotes.forEach((voteMatch) => { voteMatch.member = memberMap.get(voteMatch.member); });
 
   // Sort by descending shared votes count
-  sharedVotes.sort((a: any, b: any) => b.matchCount - a.matchCount);
+  sharedVotes.sort((a: any, b: any) => b.sharedVotesCount - a.sharedVotesCount);
 
   return sharedVotes;
 }
