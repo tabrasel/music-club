@@ -1,6 +1,11 @@
 // Import modules
 import { Request, Response, Router } from 'express';
 
+// Import interfaces
+import IAlbum from '../interfaces/IAlbum';
+import IMember from '../interfaces/IMember';
+import IRound from '../interfaces/IRound';
+
 // Import models
 import { AlbumModel } from '../models/AlbumModel';
 import { ClubModel } from '../models/ClubModel';
@@ -9,8 +14,8 @@ import { RoundModel } from '../models/RoundModel';
 
 const router: Router = Router();
 
-// TODO: /api/vote-match (requires memberId, then otherMemberId or clubId)
-// TODO: /api/round-match (requires memberId, then otherMemberId or clubId)
+// TODO: /api/shared-votes (requires memberId, then otherMemberId or clubId)
+// TODO: /api/shared-rounds (requires memberId, then otherMemberId or clubId)
 
 // Get a member's match
 router.get('/api/member-match', (req: any, res: Response) => {
@@ -22,6 +27,9 @@ router.get('/api/member-match', (req: any, res: Response) => {
   res.json('Missing one or more required args: [memberId], [clubId]');
 });
 
+/**
+ * Count the number of votes shared between a given club member and each other member
+ */
 async function getClubMemberMatches(memberId: string, clubId: string, res: Response): Promise<any> {
   // Fetch club
   const club: any = await ClubModel.getModel().findOne({ 'id': clubId }).exec();
@@ -35,11 +43,11 @@ async function getClubMemberMatches(memberId: string, clubId: string, res: Respo
   club.participantIds.forEach((id: string) => { if (id !== memberId) roundMatchMap.set(id, 0); });
 
   // Count how many votes the given member shares with every other club member
-  const member: any = await MemberModel.getModel().findOne({ 'id': memberId });
-  const participatedRounds: any[] = await RoundModel.getModel().find({ 'id': { $in: member.participatedRoundIds } });
+  const member: IMember = await MemberModel.getModel().findOne({ 'id': memberId });
+  const participatedRounds: IRound[] = await RoundModel.getModel().find({ 'id': { $in: member.participatedRoundIds } });
 
   for (const round of participatedRounds) {
-    const albums: any[] = await AlbumModel.getModel().find({ 'id': { $in: round.albumIds } });
+    const albums: IAlbum[] = await AlbumModel.getModel().find({ 'id': { $in: round.albumIds } });
 
     // Update the number of shared rounds with each participant
     round.participantIds.forEach((id: string) => {
@@ -63,9 +71,9 @@ async function getClubMemberMatches(memberId: string, clubId: string, res: Respo
   const voteMatches: any[] = Array.from(voteMatchMap, ([id, count]) => ({ 'member': id, 'matchCount': count }));
 
   // Include all member info
-  const members: any[] = await MemberModel.getModel().find({ 'id': { $in: club.participantIds } });
-  const memberMap = new Map<string, any>();
-  members.forEach((m: any) => { memberMap.set(m.id, m) });
+  const members: IMember[] = await MemberModel.getModel().find({ 'id': { $in: club.participantIds } });
+  const memberMap = new Map<string, IMember>();
+  members.forEach((m: IMember) => { memberMap.set(m.id, m) });
   voteMatches.forEach((voteMatch) => { voteMatch.member = memberMap.get(voteMatch.member); });
 
   // Sort by descending match count
