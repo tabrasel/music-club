@@ -26,6 +26,7 @@
   "homepage": "https://github.com/tabrasel/music-club#readme",
   "dependencies": {
     "aws-sdk": "^2.1033.0",
+    "axios": "^0.24.0",
     "canvas": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
