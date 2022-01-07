@@ -51,7 +51,7 @@ expressApp.use(session({
   resave: false,                     // Don't save session if unmodified
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    ttl: 60,                       // Session duration period in seconds
+    ttl: 3600,                       // Session duration period in seconds
     autoRemove: 'native'             // Remove session doc on expiry
   })
 }));
