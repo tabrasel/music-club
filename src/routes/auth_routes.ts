@@ -2,7 +2,6 @@
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import * as dotenv from 'dotenv';
 import { Request, Response, Router } from 'express';
-import store from 'store2';
 
 const router: Router = Router();
 
