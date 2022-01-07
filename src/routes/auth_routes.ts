@@ -1,7 +1,8 @@
 // Import modules
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import * as dotenv from 'dotenv';
 import { Request, Response, Router } from 'express';
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
+import store from 'store2';
 
 const router: Router = Router();
 
@@ -32,6 +33,12 @@ router.get('/api/callback', (req: any, res: any) => {
     }
   })
   .then((tokenRes) => {
+    store.set('accessToken', tokenRes.data.access_token);
+
+    // tslint:disable-next-line:no-console
+    console.log(store.get('accessToken'));
+
+
     /*
     res.json({
       accessToken: tokenRes.data.access_token,
