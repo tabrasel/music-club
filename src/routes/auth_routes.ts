@@ -40,7 +40,7 @@ router.get('/api/callback', (req: any, res: any) => {
     };
 
     // tslint:disable-next-line:no-console
-    console.log(req.session.spotifyAccount.accessToken);
+    console.log(req.session.spotifyApi.accessToken);
 
     // Redirect user out of Spotify authorization page
     res.redirect('/');
@@ -67,7 +67,6 @@ router.get('/api/callback', (req: any, res: any) => {
     */
   })
   .catch((error) => {
-    // tslint:disable-next-line:no-console
     res.sendStatus(400);
   });
 });
