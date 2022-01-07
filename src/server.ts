@@ -2,6 +2,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import * as path from 'path';
+import session from 'express-session';
 
 import { Database } from './Database';
 
@@ -39,6 +40,7 @@ const expressApp: Application = express();
 expressApp.use(cors());
 expressApp.use(express.json());
 expressApp.use(express.urlencoded({ extended: true }));
+expressApp.use(session({ secret: 'woo', resave: false, saveUninitialized: false }));
 
 // Add routes to server
 expressApp.use(albumRoutes);

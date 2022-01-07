@@ -33,11 +33,20 @@ router.get('/api/callback', (req: any, res: any) => {
     }
   })
   .then((tokenRes) => {
-    store.set('accessToken', tokenRes.data.access_token);
+    // store.set('accessToken', tokenRes.data.access_token);
 
     // tslint:disable-next-line:no-console
-    console.log(store.get('accessToken'));
+    // console.log(store.get('accessToken'));
 
+    req.session.spotifyAccount = {
+      accessToken: tokenRes.data.access_token,
+      refreshToken: tokenRes.data.refresh_token
+    };
+
+    // tslint:disable-next-line:no-console
+    console.log(req.session.spotifyAccount.accessToken);
+
+    res.redirect('/');
 
     /*
     res.json({
