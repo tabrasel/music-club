@@ -32,29 +32,19 @@ router.get('/api/callback', (req: any, res: any) => {
     }
   })
   .then((tokenRes) => {
-    // store.set('accessToken', tokenRes.data.access_token);
-
-    // tslint:disable-next-line:no-console
-    // console.log(store.get('accessToken'));
-
-    req.session.spotifyAccount = {
+    // Store token data in user session
+    req.session.spotifyApi = {
       accessToken: tokenRes.data.access_token,
-      refreshToken: tokenRes.data.refresh_token
+      refreshToken: tokenRes.data.refresh_token,
+      expiresIn: tokenRes.data.expires_in
     };
 
     // tslint:disable-next-line:no-console
     console.log(req.session.spotifyAccount.accessToken);
 
+    // Redirect user out of Spotify authorization page
     res.redirect('/');
 
-    /*
-    res.json({
-      accessToken: tokenRes.data.access_token,
-      refreshToken: tokenRes.data.refresh_token,
-      expiresIn: tokenRes.data.expires_in
-    });
-    */
-    // TODO: Save token on server and have server be the mediator between app and Spotify?
 
     /*
     axios({
