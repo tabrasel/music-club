@@ -1,8 +1,12 @@
 // Import modules
-import express, { Application } from 'express';
+import MongoStore from 'connect-mongo';
 import cors from 'cors';
-import * as path from 'path';
+import * as dotenv from 'dotenv';
+import express, { Application } from 'express';
 import session from 'express-session';
+import * as path from 'path';
+
+dotenv.config({ path: './.env'});
 
 import { Database } from './Database';
 
@@ -40,7 +44,17 @@ const expressApp: Application = express();
 expressApp.use(cors());
 expressApp.use(express.json());
 expressApp.use(express.urlencoded({ extended: true }));
-expressApp.use(session({ secret: 'woo', resave: false, saveUninitialized: false }));
+
+expressApp.use(session({
+  secret: 'keyboard cat',
+  saveUninitialized: false,          // Don't create session until something stored
+  resave: false,                     // Don't save session if unmodified
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 60,                       // Session duration period in seconds
+    autoRemove: 'native'             // Remove session doc on expiry
+  })
+}));
 
 // Add routes to server
 expressApp.use(albumRoutes);
