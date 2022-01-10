@@ -2,25 +2,16 @@
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import * as dotenv from 'dotenv';
 import { Request, Response, Router } from 'express';
+import store from 'store2';
 
 const router: Router = Router();
 
-router.get('/api/auth', (req: Request, res: Response) => {
-  res.redirect(`https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_CLIENT_ID}&redirect_uri=${process.env.SPOTIFY_REDIRECT_URI}`);
-});
-
-router.get('/api/callback', (req: any, res: any) => {
-  const code = req.query.code || null;
-
-  // Request token and pass it on
-  // Source: https://github.com/spotify/web-api-auth-examples/issues/55
+router.get('/api/token', (req: Request, res: Response) => {
   axios({
     url: 'https://accounts.spotify.com/api/token',
     method: 'post',
     params: {
-      code,
-      redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
-      grant_type: 'authorization_code'
+      grant_type: 'client_credentials'
     },
     headers: {
       'Accept': 'application/json',
@@ -32,42 +23,11 @@ router.get('/api/callback', (req: any, res: any) => {
     }
   })
   .then((tokenRes) => {
-    // Store token data in user session
-    req.session.spotifyApi = {
-      accessToken: tokenRes.data.access_token,
-      refreshToken: tokenRes.data.refresh_token,
-      expiresIn: tokenRes.data.expires_in
-    };
-
-    // tslint:disable-next-line:no-console
-    console.log(req.session.spotifyApi.accessToken);
-
-    // Redirect user out of Spotify authorization page
-    res.redirect('/');
-
-
-    /*
-    axios({
-      url: 'https://api.spotify.com/v1/me',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      params: {
-        access_token: accessToken,
-        refresh_token: refreshToken
-      }
-    }).then((profileRes) => {
-      // tslint:disable-next-line:no-console
-      console.log(profileRes.data)
-    }).catch(err => {
-        // tslint:disable-next-line:no-console
-        console.log(err)
-    })
-    */
+    store.set('spotifyAccessToken', tokenRes.data.access_token);
   })
-  .catch((error) => {
-    res.sendStatus(400);
+  .catch((tokenErr) => {
+    res.status(tokenErr.response.status);
+    res.send(tokenErr.response.statusText);
   });
 });
 
