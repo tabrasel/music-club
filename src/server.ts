@@ -25,6 +25,7 @@ import memberRoutes from './routes/member_routes';
 import memberMatchRoutes from './routes/member_match_routes';
 import roundRoutes from './routes/round_routes';
 import authRoutes from './routes/auth_routes';
+import spotifyRoutes from './routes/spotify_routes';
 
 // Connect to database
 Database.connect();
@@ -63,6 +64,7 @@ expressApp.use(memberRoutes);
 expressApp.use(memberMatchRoutes);
 expressApp.use(roundRoutes);
 expressApp.use(authRoutes);
+expressApp.use(spotifyRoutes);
 
 expressApp.get('/', (req, res) => {
   res.send('Hello! API is available at api/');
