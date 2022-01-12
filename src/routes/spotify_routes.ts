@@ -5,6 +5,31 @@ import store from 'store2';
 
 const router: Router = Router();
 
+function getAccessToken(): void {
+  axios({
+    url: 'https://accounts.spotify.com/api/token',
+    method: 'post',
+    params: {
+      grant_type: 'client_credentials'
+    },
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    auth: {
+      username: process.env.SPOTIFY_CLIENT_ID,
+      password: process.env.SPOTIFY_CLIENT_SECRET
+    }
+  })
+  .then(async (tokenRes) => {
+    store.set('spotifyAccessToken', tokenRes.data.access_token);
+  })
+  .catch((tokenErr) => {
+    // tslint:disable-next-line:no-console
+    console.log(tokenErr);
+  });
+}
+
 async function searchForAlbum(query: string): Promise<any> {
   const accessToken = store.get('spotifyAccessToken');
   const encodedQuery: string = encodeURIComponent(query);
@@ -21,6 +46,23 @@ async function searchForAlbum(query: string): Promise<any> {
   })
 
   return searchResult;
+}
+
+function fetchArtist(id: string) {
+  const accessToken = store.get('spotifyAccessToken');
+
+  const artistResult: any = axios({
+    url: `https://api.spotify.com/v1/artists/${id}`,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    params: {
+      access_token: accessToken
+    }
+  })
+
+  return artistResult;
 }
 
 // Search for an album
@@ -65,6 +107,19 @@ router.get('/api/album-search', async (req: any, res: Response) => {
       res.status(tokenErr.response.status);
       res.send(tokenErr.response.statusText);
     });
+  }
+});
+
+router.get('/api/artist', async (req: any, res: Response) => {
+  try {
+    const artistResult: any = await fetchArtist(req.query.id);
+    res.json(artistResult.data);
+  } catch(err) {
+    if (err.response.status !== 401) {
+      res.status(err.response.status);
+      res.send(err.response.statusText);
+      return;
+    }
   }
 });
 
