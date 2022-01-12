@@ -26,16 +26,21 @@
   "homepage": "https://github.com/tabrasel/music-club#readme",
   "dependencies": {
     "aws-sdk": "^2.1033.0",
+    "axios": "^0.24.0",
     "canvas": "^2.8.0",
+    "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.2",
     "mongoose": "^6.0.13",
+    "store2": "^2.13.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.3.2",
     "@types/uuid": "^8.3.1",

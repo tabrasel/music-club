@@ -1,7 +1,12 @@
 // Import modules
-import express, { Application } from 'express';
+import MongoStore from 'connect-mongo';
 import cors from 'cors';
+import * as dotenv from 'dotenv';
+import express, { Application } from 'express';
+import session from 'express-session';
 import * as path from 'path';
+
+dotenv.config({ path: './.env'});
 
 import { Database } from './Database';
 
@@ -19,6 +24,8 @@ import clubRoutes from './routes/club_routes';
 import memberRoutes from './routes/member_routes';
 import memberMatchRoutes from './routes/member_match_routes';
 import roundRoutes from './routes/round_routes';
+import authRoutes from './routes/auth_routes';
+import spotifyRoutes from './routes/spotify_routes';
 
 // Connect to database
 Database.connect();
@@ -39,12 +46,25 @@ expressApp.use(cors());
 expressApp.use(express.json());
 expressApp.use(express.urlencoded({ extended: true }));
 
+expressApp.use(session({
+  secret: 'keyboard cat',
+  saveUninitialized: false,          // Don't create session until something stored
+  resave: false,                     // Don't save session if unmodified
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 3600,                       // Session duration period in seconds
+    autoRemove: 'native'             // Remove session doc on expiry
+  })
+}));
+
 // Add routes to server
 expressApp.use(albumRoutes);
 expressApp.use(clubRoutes);
 expressApp.use(memberRoutes);
 expressApp.use(memberMatchRoutes);
 expressApp.use(roundRoutes);
+expressApp.use(authRoutes);
+expressApp.use(spotifyRoutes);
 
 expressApp.get('/', (req, res) => {
   res.send('Hello! API is available at api/');
