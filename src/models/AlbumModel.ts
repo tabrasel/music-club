@@ -15,8 +15,10 @@ class AlbumModel {
       {
         id: String,
         title: String,
-        artist: String,
+        artists: [String],
+        artistGenres: [String],
         trackCount: Number,
+        releaseDate: String,
         imageUrl: String,
         posterId: String,
         pickedTracks: [{
@@ -42,8 +44,10 @@ class AlbumModel {
     const albumDoc: IAlbum = {
       id: uuidv4(),
       title: albumInfo.title,
-      artist: albumInfo.artist,
+      artists: albumInfo.artists,
+      artistGenres: albumInfo.artistGenres,
       trackCount: albumInfo.trackCount,
+      releaseDate: albumInfo.releaseDate,
       imageUrl: albumInfo.imageUrl,
       posterId: albumInfo.posterId,
       pickedTracks: [],
