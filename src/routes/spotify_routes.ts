@@ -61,7 +61,7 @@ router.get('/api/album-search', async (req: any, res: Response) => {
     const searchResult: any = await fetchAlbumSearch(req.query.q);
     res.json(searchResult.data.albums);
   } catch(err) {
-    // Error if the issue wasn't authorization
+    // Only retry if there was an authorization error
     if (err.response.status !== 401) {
       res.status(err.response.status);
       res.send(err.response.statusText);
@@ -82,8 +82,8 @@ router.get('/api/album-search', async (req: any, res: Response) => {
       const searchResult: any = await fetchAlbumSearch(req.query.q);
       res.json(searchResult.data.albums);
     } catch(retryErr) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
+      res.status(retryErr.response.status);
+      res.send(retryErr.response.statusText);
     }
   }
 });
@@ -115,7 +115,7 @@ router.get('/api/artist', async (req: any, res: Response) => {
     const artistResult: any = await fetchArtist(req.query.id);
     res.json(artistResult.data);
   } catch(err) {
-    // Error if the issue wasn't authorization
+    // Only retry if there was an authorization error
     if (err.response.status !== 401) {
       res.status(err.response.status);
       res.send(err.response.statusText);
@@ -136,8 +136,8 @@ router.get('/api/artist', async (req: any, res: Response) => {
       const artistResult: any = await fetchArtist(req.query.id);
       res.json(artistResult.data);
     } catch(retryErr) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
+      res.status(retryErr.response.status);
+      res.send(retryErr.response.statusText);
     }
   }
 });
