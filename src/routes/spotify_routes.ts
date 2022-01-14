@@ -24,7 +24,7 @@ function updateAccessToken(): void {
       password: process.env.SPOTIFY_CLIENT_SECRET
     }
   })
-  .then(async (tokenRes) => {
+  .then((tokenRes: AxiosResponse) => {
     store.set('spotifyAccessToken', tokenRes.data.access_token);
   })
   .catch((tokenErr) => {
@@ -38,11 +38,11 @@ function updateAccessToken(): void {
  */
 router.get('/api/album-search', async (req: any, res: Response) => {
   // Define the request
-  function fetchAlbumSearch(query: string): Promise<any> {
-    const accessToken = store.get('spotifyAccessToken');
+  function fetchAlbumSearch(query: string): AxiosPromise {
+    const accessToken: string = store.get('spotifyAccessToken');
     const encodedQuery: string = encodeURIComponent(query);
 
-    const searchResult: any = axios({
+    const searchResult: AxiosPromise = axios({
       url: `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=10`,
       headers: {
         'Accept': 'application/json',
@@ -93,10 +93,10 @@ router.get('/api/album-search', async (req: any, res: Response) => {
  */
 router.get('/api/artist', async (req: any, res: Response) => {
   // Define the request
-  function fetchArtist(id: string): Promise<any> {
-    const accessToken = store.get('spotifyAccessToken');
+  function fetchArtist(id: string): AxiosPromise {
+    const accessToken: string = store.get('spotifyAccessToken');
 
-    const artistResult: any = axios({
+    const artistResult: AxiosPromise = axios({
       url: `https://api.spotify.com/v1/artists/${id}`,
       headers: {
         'Accept': 'application/json',
