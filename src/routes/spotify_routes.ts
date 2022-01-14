@@ -30,7 +30,7 @@ function updateAccessToken(): void {
   });
 }
 
-async function searchForAlbum(query: string): Promise<any> {
+function searchForAlbum(query: string): Promise<any> {
   const accessToken = store.get('spotifyAccessToken');
   const encodedQuery: string = encodeURIComponent(query);
 
@@ -48,7 +48,7 @@ async function searchForAlbum(query: string): Promise<any> {
   return searchResult;
 }
 
-function fetchArtist(id: string) {
+function fetchArtist(id: string): Promise<any> {
   const accessToken = store.get('spotifyAccessToken');
 
   const artistResult: any = axios({
