@@ -5,6 +5,9 @@ import store from 'store2';
 
 const router: Router = Router();
 
+/**
+ * Update the server's Spotify API access token.
+ */
 function updateAccessToken(): void {
   axios({
     url: 'https://accounts.spotify.com/api/token',
@@ -30,7 +33,9 @@ function updateAccessToken(): void {
   });
 }
 
-// Search for an album
+/**
+ * Route for making a Spotify API album search request.
+ */
 router.get('/api/album-search', async (req: any, res: Response) => {
   // Define the request
   function fetchAlbumSearch(query: string): Promise<any> {
@@ -83,6 +88,9 @@ router.get('/api/album-search', async (req: any, res: Response) => {
   }
 });
 
+/**
+ * Route for making a Spotify API artist request.
+ */
 router.get('/api/artist', async (req: any, res: Response) => {
   // Define the request
   function fetchArtist(id: string): Promise<any> {
