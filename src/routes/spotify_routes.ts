@@ -30,46 +30,30 @@ function updateAccessToken(): void {
   });
 }
 
-function searchForAlbum(query: string): Promise<any> {
-  const accessToken = store.get('spotifyAccessToken');
-  const encodedQuery: string = encodeURIComponent(query);
-
-  const searchResult: any = axios({
-    url: `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=10`,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    params: {
-      access_token: accessToken
-    }
-  })
-
-  return searchResult;
-}
-
-function fetchArtist(id: string): Promise<any> {
-  const accessToken = store.get('spotifyAccessToken');
-
-  const artistResult: any = axios({
-    url: `https://api.spotify.com/v1/artists/${id}`,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    params: {
-      access_token: accessToken
-    }
-  })
-
-  return artistResult;
-}
-
 // Search for an album
 router.get('/api/album-search', async (req: any, res: Response) => {
+  // Define the request
+  function fetchAlbumSearch(query: string): Promise<any> {
+    const accessToken = store.get('spotifyAccessToken');
+    const encodedQuery: string = encodeURIComponent(query);
+
+    const searchResult: any = axios({
+      url: `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=10`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: accessToken
+      }
+    })
+
+    return searchResult;
+  }
+
   // Try making the request
   try {
-    const searchResult: any = await searchForAlbum(req.query.q);
+    const searchResult: any = await fetchAlbumSearch(req.query.q);
     res.json(searchResult.data.albums);
   } catch(err) {
     // Error if the issue wasn't authorization
@@ -90,7 +74,7 @@ router.get('/api/album-search', async (req: any, res: Response) => {
 
     // Retry the request
     try {
-      const searchResult: any = await searchForAlbum(req.query.q);
+      const searchResult: any = await fetchAlbumSearch(req.query.q);
       res.json(searchResult.data.albums);
     } catch(retryErr) {
       res.status(err.response.status);
@@ -100,6 +84,24 @@ router.get('/api/album-search', async (req: any, res: Response) => {
 });
 
 router.get('/api/artist', async (req: any, res: Response) => {
+  // Define the request
+  function fetchArtist(id: string): Promise<any> {
+    const accessToken = store.get('spotifyAccessToken');
+
+    const artistResult: any = axios({
+      url: `https://api.spotify.com/v1/artists/${id}`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: accessToken
+      }
+    })
+
+    return artistResult;
+  }
+
   // Try making the request
   try {
     const artistResult: any = await fetchArtist(req.query.id);
