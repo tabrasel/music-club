@@ -86,4 +86,35 @@ async function countSharedClubVotes(memberId: string, clubId: string): Promise<a
   return sharedVotes;
 }
 
+/**
+ * Get a member's top posted album artist genres.
+ */
+router.get('/api/member-genres', async (req: any, res: Response) => {
+  const memberId: string = req.query.memberId;
+
+  // Fetch member
+  const member: IMember = await MemberModel.getModel().findOne({ 'id' : memberId });
+
+  // Fetch posted albums
+  const albums: IAlbum[] = await AlbumModel.getModel().find({ 'id': { $in: member.postedAlbumIds } });
+
+  // Find all posted artist genres and their corresponding albums
+  const genresMap = new Map<string, string[]>();
+  for (const album of albums) {
+    for (const genre of album.artistGenres) {
+      if (!genresMap.has(genre))
+        genresMap.set(genre, []);
+      genresMap.get(genre).push(album.title);
+    }
+  }
+
+  // Convert genre map to array
+  const genres: any[] = Array.from(genresMap, ([genre, albumTitles]) => ({ genre, albumTitles }));
+
+  // Sort by descending number of albums
+  genres.sort((a: any, b: any) => b.albumTitles.length - a.albumTitles.length);
+
+  res.json(genres);
+});
+
 export default router;
