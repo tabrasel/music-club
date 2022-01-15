@@ -61,7 +61,7 @@ expressApp.use(session({
 expressApp.use(albumRoutes);
 expressApp.use(clubRoutes);
 expressApp.use(memberRoutes);
-expressApp.use(memberMatchRoutes);
+expressApp.use(memberInsightsRoutes);
 expressApp.use(roundRoutes);
 expressApp.use(authRoutes);
 expressApp.use(spotifyRoutes);
