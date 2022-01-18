@@ -98,7 +98,7 @@ router.get('/api/member-genres', async (req: any, res: Response) => {
   // Fetch posted albums
   const albums: IAlbum[] = await AlbumModel.getModel().find({ 'id': { $in: member.postedAlbumIds } });
 
-  // Find all posted artist genres and their corresponding albums
+  // Categorize all posted albums by artist genre
   const genresMap = new Map<string, string[]>();
   for (const album of albums) {
     for (const genre of album.artistGenres) {
@@ -115,6 +115,49 @@ router.get('/api/member-genres', async (req: any, res: Response) => {
   genres.sort((a: any, b: any) => b.albumTitles.length - a.albumTitles.length);
 
   res.json(genres);
+});
+
+router.get('/api/member-release', async (req: any, res: Response) => {
+  const memberId: string = req.query.memberId;
+  const byDecade: boolean = 'byDecade' in req.query ? req.query.byDecade : false;
+  const releaseTimeUnit: string = byDecade ? 'decade' : 'year';
+
+  // Fetch member
+  const member: IMember = await MemberModel.getModel().findOne({ 'id' : memberId });
+
+  // Fetch posted albums
+  const albums: IAlbum[] = await AlbumModel.getModel().find({ 'id': { $in: member.postedAlbumIds } });
+
+  // Categorize all posted albums by release year
+  const releaseMap = new Map<string, string[]>();
+  for (const album of albums) {
+    const releaseYear: string = album.releaseDate.split('-')[0];
+    const releaseTimeLabel: string = byDecade
+      ? releaseYear.substring(0, releaseYear.length - 1) + '0'
+      : releaseYear;
+
+    if (!releaseMap.has(releaseTimeLabel))
+      releaseMap.set(releaseTimeLabel, []);
+    releaseMap.get(releaseTimeLabel).push(album.title);
+  }
+
+  // Convert release map to array
+  let releases: any[] = Array.from(releaseMap, ([releaseTimeLabel, albumTitles]) => ({ releaseTimeLabel, albumTitles }))
+
+  // Sort by release year
+  releases.sort((a: any, b: any) => a.releaseTimeLabel - b.releaseTimeLabel);
+
+  // Format decade labels
+  if (byDecade) {
+    releases = releases.map((x: any) => {
+      return {
+        releaseTimeLabel: x.releaseTimeLabel + 's',
+        albumTitles: x.albumTitles
+      }
+    });
+  }
+
+  res.json({ releaseTimeUnit, releases });
 });
 
 export default router;
