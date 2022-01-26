@@ -196,4 +196,58 @@ router.get('/api/spotify-album-tracks', async (req: any, res: Response) => {
   }
 });
 
+/**
+ * Route for making a Spotify API audio features request.
+ */
+router.get('/api/spotify-audio-features', async (req: any, res: Response) => {
+  // Define the request
+  function fetchAudioFeatures(spotifyTrackId: string): AxiosPromise {
+    const accessToken: string = store.get('spotifyAccessToken');
+
+    const audioFeaturesResult: AxiosPromise = axios({
+      url: `https://api.spotify.com/v1/audio-features/${spotifyTrackId}`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: accessToken
+      }
+    })
+
+    return audioFeaturesResult;
+  }
+
+  // Try making the request
+  try {
+    const audioFeaturesResult: any = await fetchAudioFeatures(req.query.spotifyTrackId);
+    res.json(audioFeaturesResult.data);
+  } catch(err) {
+    // Only retry if there was an authorization error
+    if (err.response.status !== 401) {
+      res.status(err.response.status);
+      res.send(err.response.statusText);
+      return;
+    }
+
+    // Try updating the access token
+    try {
+      await updateAccessToken();
+    } catch(tokenErr) {
+      res.status(tokenErr.response.status);
+      res.send(tokenErr.response.statusText);
+      return;
+    }
+
+    // Retry the request
+    try {
+      const audioFeaturesResult: any = await fetchAudioFeatures(req.query.spotifyTrackId);
+      res.json(audioFeaturesResult.data);
+    } catch(retryErr) {
+      res.status(retryErr.response.status);
+      res.send(retryErr.response.statusText);
+    }
+  }
+});
+
 export default router;
