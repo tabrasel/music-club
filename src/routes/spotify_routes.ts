@@ -8,8 +8,8 @@ const router: Router = Router();
 /**
  * Update the server's Spotify API access token.
  */
-function updateAccessToken(): void {
-  axios({
+async function updateAccessToken(): Promise<void> {
+  const tokenRes: any = await axios({
     url: 'https://accounts.spotify.com/api/token',
     method: 'post',
     params: {
@@ -24,230 +24,136 @@ function updateAccessToken(): void {
       password: process.env.SPOTIFY_CLIENT_SECRET
     }
   })
-  .then((tokenRes: AxiosResponse) => {
-    store.set('spotifyAccessToken', tokenRes.data.access_token);
-  })
-  .catch((tokenErr) => {
-    // tslint:disable-next-line:no-console
-    console.log(tokenErr);
-  });
+
+  store.set('spotifyAccessToken', tokenRes.data.access_token);
 }
 
 /**
- * Route for making a Spotify API album search request.
+ * Make a request to the Spotify API. If the initial request was unauthorized, try updating the access  token and retry
+ * the request.
+ * @param reqFun request function to perform
+ * @param res    result object of the route which called this function
  */
-router.get('/api/album-search', async (req: any, res: Response) => {
-  // Define the request
-  function fetchAlbumSearch(query: string): AxiosPromise {
-    const accessToken: string = store.get('spotifyAccessToken');
-    const encodedQuery: string = encodeURIComponent(query);
+async function makeSpotifyRequest(reqFun: any, res: Response): Promise<void> {
+  try {
+    await reqFun();
+  } catch(err) {
+    // Only retry the request if there was an authorization error
+    if (err.response.status !== 401) {
+      res.status(err.response.status);
+      res.send(err.response.statusText);
+      return;
+    }
 
-    const searchResult: AxiosPromise = axios({
+    // Try updating the access token
+    try {
+      await updateAccessToken();
+    } catch(tokenErr) {
+      res.status(tokenErr.response.status);
+      res.send(tokenErr.response.statusText);
+      return;
+    }
+
+    // Retry the request
+    try {
+      await reqFun();
+    } catch(retryErr) {
+      res.status(retryErr.response.status);
+      res.send(retryErr.response.statusText);
+    }
+  }
+}
+
+// TODO: Make the search endpoint more generic. Let the client define the item type.
+
+/**
+ * Endpoint for making a Spotify API album search request.
+ */
+router.get('/api/album-search', async (req: any, res: Response): Promise<void> => {
+  const encodedQuery: string = encodeURIComponent(req.query.q);
+
+  const requestFun = async (): Promise<void> => {
+    const searchResult: any = await axios({
       url: `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=10`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       params: {
-        access_token: accessToken
+        access_token: store.get('spotifyAccessToken')
       }
-    })
+    });
 
-    return searchResult;
-  }
-
-  // Try making the request
-  try {
-    const searchResult: any = await fetchAlbumSearch(req.query.q);
     res.json(searchResult.data.albums);
-  } catch(err) {
-    // Only retry if there was an authorization error
-    if (err.response.status !== 401) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
-      return;
-    }
+  };
 
-    // Try updating the access token
-    try {
-      await updateAccessToken();
-    } catch(tokenErr) {
-      res.status(tokenErr.response.status);
-      res.send(tokenErr.response.statusText);
-      return;
-    }
-
-    // Retry the request
-    try {
-      const searchResult: any = await fetchAlbumSearch(req.query.q);
-      res.json(searchResult.data.albums);
-    } catch(retryErr) {
-      res.status(retryErr.response.status);
-      res.send(retryErr.response.statusText);
-    }
-  }
+  makeSpotifyRequest(requestFun, res);
 });
 
 /**
- * Route for making a Spotify API artist request.
+ * Endpoint for making a Spotify API artist request.
  */
-router.get('/api/artist', async (req: any, res: Response) => {
-  // Define the request
-  function fetchArtist(id: string): AxiosPromise {
-    const accessToken: string = store.get('spotifyAccessToken');
-
-    const artistResult: AxiosPromise = axios({
-      url: `https://api.spotify.com/v1/artists/${id}`,
+router.get('/api/artist', async (req: any, res: Response): Promise<void> => {
+  const requestFun = async (): Promise<void> => {
+    const artistResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/artists/${req.query.id}`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       params: {
-        access_token: accessToken
+        access_token: store.get('spotifyAccessToken')
       }
-    })
+    });
 
-    return artistResult;
-  }
+   res.json(artistResult.data);
+ };
 
-  // Try making the request
-  try {
-    const artistResult: any = await fetchArtist(req.query.id);
-    res.json(artistResult.data);
-  } catch(err) {
-    // Only retry if there was an authorization error
-    if (err.response.status !== 401) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
-      return;
-    }
-
-    // Try updating the access token
-    try {
-      await updateAccessToken();
-    } catch(tokenErr) {
-      res.status(tokenErr.response.status);
-      res.send(tokenErr.response.statusText);
-      return;
-    }
-
-    // Retry the request
-    try {
-      const artistResult: any = await fetchArtist(req.query.id);
-      res.json(artistResult.data);
-    } catch(retryErr) {
-      res.status(retryErr.response.status);
-      res.send(retryErr.response.statusText);
-    }
-  }
+ makeSpotifyRequest(requestFun, res);
 });
 
 /**
- * Route for making a Spotify API album tracks request.
+ * Endpoint for making a Spotify API album tracks request.
  */
-router.get('/api/spotify-album-tracks', async (req: any, res: Response) => {
-  // Define the request
-  function fetchTracks(spotifyAlbumId: string): AxiosPromise {
-    const accessToken: string = store.get('spotifyAccessToken');
-
-    const tracksResult: AxiosPromise = axios({
-      url: `https://api.spotify.com/v1/albums/${spotifyAlbumId}/tracks`,
+router.get('/api/spotify-album-tracks', async (req: any, res: Response): Promise<void> => {
+  const requestFun = async (): Promise<void> => {
+    const tracksResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/albums/${req.query.spotifyAlbumId}/tracks`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       params: {
-        access_token: accessToken
+        access_token: store.get('spotifyAccessToken')
       }
-    })
+    });
 
-    return tracksResult;
-  }
-
-  // Try making the request
-  try {
-    const tracksResult: any = await fetchTracks(req.query.spotifyAlbumId);
     res.json(tracksResult.data);
-  } catch(err) {
-    // Only retry if there was an authorization error
-    if (err.response.status !== 401) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
-      return;
-    }
+  };
 
-    // Try updating the access token
-    try {
-      await updateAccessToken();
-    } catch(tokenErr) {
-      res.status(tokenErr.response.status);
-      res.send(tokenErr.response.statusText);
-      return;
-    }
-
-    // Retry the request
-    try {
-      const tracksResult: any = await fetchTracks(req.query.spotifyAlbumId);
-      res.json(tracksResult.data);
-    } catch(retryErr) {
-      res.status(retryErr.response.status);
-      res.send(retryErr.response.statusText);
-    }
-  }
+  makeSpotifyRequest(requestFun, res);
 });
 
 /**
- * Route for making a Spotify API audio features request.
+ * Endpoint for making a Spotify API audio features request.
  */
 router.get('/api/spotify-audio-features', async (req: any, res: Response) => {
-  // Define the request
-  function fetchAudioFeatures(spotifyTrackId: string): AxiosPromise {
-    const accessToken: string = store.get('spotifyAccessToken');
-
-    const audioFeaturesResult: AxiosPromise = axios({
-      url: `https://api.spotify.com/v1/audio-features/${spotifyTrackId}`,
+  const requestFun = async (): Promise<void> => {
+    const audioFeaturesResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/audio-features/${req.query.spotifyTrackId}`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       params: {
-        access_token: accessToken
+        access_token: store.get('spotifyAccessToken')
       }
-    })
+    });
 
-    return audioFeaturesResult;
-  }
-
-  // Try making the request
-  try {
-    const audioFeaturesResult: any = await fetchAudioFeatures(req.query.spotifyTrackId);
     res.json(audioFeaturesResult.data);
-  } catch(err) {
-    // Only retry if there was an authorization error
-    if (err.response.status !== 401) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
-      return;
-    }
+  };
 
-    // Try updating the access token
-    try {
-      await updateAccessToken();
-    } catch(tokenErr) {
-      res.status(tokenErr.response.status);
-      res.send(tokenErr.response.statusText);
-      return;
-    }
-
-    // Retry the request
-    try {
-      const audioFeaturesResult: any = await fetchAudioFeatures(req.query.spotifyTrackId);
-      res.json(audioFeaturesResult.data);
-    } catch(retryErr) {
-      res.status(retryErr.response.status);
-      res.send(retryErr.response.statusText);
-    }
-  }
+  makeSpotifyRequest(requestFun, res);
 });
 
 export default router;
