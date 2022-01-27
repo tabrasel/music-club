@@ -14,6 +14,7 @@ class AlbumModel {
     const schema: mongoose.Schema = new mongoose.Schema(
       {
         id: String,
+        spotifyId: String,
         title: String,
         artists: [String],
         artistGenres: [String],
@@ -26,6 +27,28 @@ class AlbumModel {
           trackNumber: Number,
           pickerIds: [String]
         }],
+        tracks: [{
+          spotifyId: String,
+          title: String,
+          diskNumber: Number,
+          trackNumber: Number,
+          duration: Number,
+          audioFeatures: {
+            tempo: Number,
+            timeSignature: String,
+            key: String,
+            mode: String,
+            acousticness: Number,
+            energy: Number,
+            danceability: Number,
+            instrumentalness: Number,
+            liveness: Number,
+            speechiness: Number,
+            valence: Number
+          },
+          pickerIds: [String]
+        }],
+        topDiskNumber: Number,
         topTrackNumber: Number
       },
       { collection: 'albums' }
@@ -43,6 +66,7 @@ class AlbumModel {
     const albumInfo = req.body;
     const albumDoc: IAlbum = {
       id: uuidv4(),
+      spotifyId: albumInfo.spotifyId,
       title: albumInfo.title,
       artists: albumInfo.artists,
       artistGenres: albumInfo.artistGenres,
@@ -51,6 +75,8 @@ class AlbumModel {
       imageUrl: albumInfo.imageUrl,
       posterId: albumInfo.posterId,
       pickedTracks: [],
+      tracks: albumInfo.tracks,
+      topDiskNumber: null,
       topTrackNumber: null
     }
 
