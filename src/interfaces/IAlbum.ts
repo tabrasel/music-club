@@ -1,5 +1,6 @@
 interface IAlbum {
   id: string,
+  spotifyId: string,
   title: string,
   artists: string[],
   artistGenres: string[],
@@ -12,6 +13,27 @@ interface IAlbum {
     trackNumber: number,
     pickerIds: string[]
   }[],
+  tracks: {
+    title: string,
+    diskNumber: number,
+    trackNumber: number,
+    duration: number,
+    audioFeatures: {
+      tempo: number,
+      timeSignature: string,
+      key: string,
+      mode: string,
+      acousticness: number,
+      energy: number,
+      danceability: number,
+      instrumentalness: number,
+      liveness: number,
+      speechiness: number,
+      valence: number
+    }[],
+    pickerIds: string[]
+  },
+  topDiskNumber: number,
   topTrackNumber: number
 }
 
