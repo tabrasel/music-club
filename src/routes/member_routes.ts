@@ -12,27 +12,34 @@ router.post('/api/member', (req: Request, res: Response) => {
 });
 
 // Update an existing member
-router.put('/api/member', (req: any, res: Response) => {
+router.put('/api/member', (req: Request, res: Response) => {
   return MemberModel.updateMember(req, res);
 });
 
 // Delete an existing member
-router.delete('/api/member', (req: any, res: Response) => {
+router.delete('/api/member', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
   return MemberModel.deleteMember(req, res);
 });
 
 // Get a member
-router.get('/api/member', (req: any, res: Response) => {
-  if ('id' in req.query || ('firstName' in req.query && 'lastName' in req.query)) {
-    return MemberModel.getMember(req, res);
+router.get('/api/member', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
   }
 
-  res.status(400);
-  res.json('Missing required args: [id] or [firstName] & [lastName]');
+  return MemberModel.getMember(req, res);
 });
 
 // Get all members
-router.get('/api/members', (req: any, res: Response) => {
+router.get('/api/members', (req: Request, res: Response) => {
   return MemberModel.getAllMembers(res);
 });
 
