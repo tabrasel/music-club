@@ -12,27 +12,34 @@ router.post('/api/club', (req: Request, res: Response) => {
 });
 
 // Update an existing club
-router.put('/api/club', (req: any, res: Response) => {
+router.put('/api/club', (req: Request, res: Response) => {
   return ClubModel.updateClub(req, res);
 });
 
 // Delete an existing club
-router.delete('/api/club', (req: any, res: Response) => {
+router.delete('/api/club', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
   return ClubModel.deleteClub(req, res);
 });
 
 // Get a club
-router.get('/api/club', (req: any, res: Response) => {
-  if ('id' in req.query) {
-    return ClubModel.getClub(req, res);
+router.get('/api/club', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
   }
 
-  res.status(400);
-  res.json('Missing required args: [id]');
+  return ClubModel.getClub(req, res);
 });
 
 // Get all clubs
-router.get('/api/clubs', (req: any, res: Response) => {
+router.get('/api/clubs', (req: Request, res: Response) => {
   return ClubModel.getAllClubs(res);
 });
 
