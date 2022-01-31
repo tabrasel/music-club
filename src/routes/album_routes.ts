@@ -12,23 +12,30 @@ router.post('/api/album', (req: Request, res: Response) => {
 });
 
 // Update an existing album
-router.put('/api/album', (req: any, res: Response) => {
+router.put('/api/album', (req: Request, res: Response) => {
   return AlbumModel.updateAlbum(req, res);
 });
 
 // Delete an existing album
-router.delete('/api/album', (req: any, res: Response) => {
+router.delete('/api/album', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
   return AlbumModel.deleteAlbum(req, res);
 });
 
 // Get an album
-router.get('/api/album', (req: any, res: Response) => {
-  if ('id' in req.query || ('title' in req.query && 'artist' in req.query)) {
-    return AlbumModel.getAlbum(req, res);
+router.get('/api/album', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
   }
 
-  res.status(400);
-  res.json('Missing required args: [id] or [title] & [artist]');
+  return AlbumModel.getAlbum(req, res);
 });
 
 export default router;

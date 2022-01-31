@@ -12,27 +12,34 @@ router.post('/api/round', (req: Request, res: Response) => {
 });
 
 // Update an existing round
-router.put('/api/round', (req: any, res: Response) => {
+router.put('/api/round', (req: Request, res: Response) => {
   return RoundModel.updateRound(req, res);
 });
 
 // Delete an existing round
-router.delete('/api/round', (req: any, res: Response) => {
+router.delete('/api/round', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
   return RoundModel.deleteRound(req, res);
 });
 
 // Get a round
-router.get('/api/round', (req: any, res: Response) => {
-  if ('id' in req.query) {
-    return RoundModel.getRound(req, res);
+router.get('/api/round', (req: Request, res: Response) => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
   }
 
-  res.status(400);
-  res.json('Missing required args: [id] or [number]');
+  return RoundModel.getRound(req, res);
 });
 
 // Get all rounds
-router.get('/api/rounds', (req: any, res: Response) => {
+router.get('/api/rounds', (req: Request, res: Response) => {
   return RoundModel.getAllRounds(res);
 });
 

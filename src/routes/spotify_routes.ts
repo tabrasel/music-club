@@ -69,7 +69,13 @@ async function makeSpotifyRequest(reqFun: any, res: Response): Promise<void> {
 /**
  * Endpoint for making a Spotify API album search request.
  */
-router.get('/api/album-search', async (req: any, res: Response): Promise<void> => {
+router.get('/api/album-search', async (req: Request, res: Response): Promise<void> => {
+  if (!('q' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: q');
+    return;
+  }
+
   const encodedQuery: string = encodeURIComponent(req.query.q);
 
   const requestFun = async (): Promise<void> => {
@@ -93,7 +99,13 @@ router.get('/api/album-search', async (req: any, res: Response): Promise<void> =
 /**
  * Endpoint for making a Spotify API artist request.
  */
-router.get('/api/artist', async (req: any, res: Response): Promise<void> => {
+router.get('/api/artist', async (req: Request, res: Response): Promise<void> => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
   const requestFun = async (): Promise<void> => {
     const artistResult: AxiosResponse = await axios({
       url: `https://api.spotify.com/v1/artists/${req.query.id}`,
@@ -115,7 +127,13 @@ router.get('/api/artist', async (req: any, res: Response): Promise<void> => {
 /**
  * Endpoint for making a Spotify API album tracks request.
  */
-router.get('/api/spotify-album-tracks', async (req: any, res: Response): Promise<void> => {
+router.get('/api/spotify-album-tracks', async (req: Request, res: Response): Promise<void> => {
+  if (!('spotifyAlbumId' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: spotifyAlbumId');
+    return;
+  }
+
   const requestFun = async (): Promise<void> => {
     const tracksResult: AxiosResponse = await axios({
       url: `https://api.spotify.com/v1/albums/${req.query.spotifyAlbumId}/tracks`,
@@ -137,7 +155,13 @@ router.get('/api/spotify-album-tracks', async (req: any, res: Response): Promise
 /**
  * Endpoint for making a Spotify API audio features request.
  */
-router.get('/api/spotify-audio-features', async (req: any, res: Response) => {
+router.get('/api/spotify-audio-features', async (req: Request, res: Response) => {
+  if (!('spotifyTrackId' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: spotifyTrackId');
+    return;
+  }
+
   const requestFun = async (): Promise<void> => {
     const audioFeaturesResult: AxiosResponse = await axios({
       url: `https://api.spotify.com/v1/audio-features/${req.query.spotifyTrackId}`,
