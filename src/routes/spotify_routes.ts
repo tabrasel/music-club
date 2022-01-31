@@ -224,4 +224,4 @@ router.get('/api/spotify-audio-features', async (req: Request, res: Response) =>
   }
 });
 
-export default router;
+export { router, fetchSpotifyAlbumSearch, fetchSpotifyArtist, fetchSpotifyAlbumTracks, fetchSpotifyAudioFeatures };
