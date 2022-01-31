@@ -76,7 +76,7 @@ router.get('/api/album-search', async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const encodedQuery: string = encodeURIComponent(req.query.q);
+  const encodedQuery: string = encodeURIComponent(req.query.q.toString());
 
   const requestFun = async (): Promise<void> => {
     const searchResult: any = await axios({
