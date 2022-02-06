@@ -5,6 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 import IAlbum from '../interfaces/IAlbum';
 
+import {
+  fetchSpotifyAlbum,
+  fetchSpotifyArtist,
+  fetchSpotifyAlbumTracks,
+  fetchSpotifyAudioFeatures
+} from '../routes/spotify_routes';
+
 class AlbumModel {
 
   private static model: mongoose.Model<IAlbum>;
@@ -59,26 +66,38 @@ class AlbumModel {
   }
 
   /**
-   * Create a new album document.
+   * Create a new album in the database.
+   * @param spotifyAlbumId Spotify ID of the album
+   * @param posterId       member ID of the album poster
+   * @return the created album document
    */
-  public static createAlbum(req: any, res: Response): void {
-    // Define a document for the album
-    const albumInfo = req.body;
-    const albumDoc: IAlbum = {
-      id: uuidv4(),
-      spotifyId: albumInfo.spotifyId,
-      title: albumInfo.title,
-      artists: albumInfo.artists,
-      artistGenres: albumInfo.artistGenres,
-      trackCount: albumInfo.trackCount,
-      releaseDate: albumInfo.releaseDate,
-      imageUrl: albumInfo.imageUrl,
-      posterId: albumInfo.posterId,
-      pickedTracks: [],
-      tracks: albumInfo.tracks,
-      topDiskNumber: null,
-      topTrackNumber: null
+  public static async create(spotifyAlbumId: string, posterId: string): Promise<any> {
+    try {
+      // Fetch album data
+      const spotifyAlbumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
+
+      // Define post data
+      const postData: any = {
+        posterId,
+        topDiskNumber: null,
+        topTrackNumber: null,
+        tracks: spotifyAlbumData.tracks.map((track: any): any => { return { ...track, pickerIds: [] }; })
+      };
+
+      // Create album document
+      const albumDoc: any = {
+        id: uuidv4(),
+        ...spotifyAlbumData,
+        ...postData
+      };
+
+      // Save document to database
+      const createdAlbum: any = this.model.create(albumDoc);
+      return Promise.resolve(createdAlbum);
+    } catch (err: any) {
+      throw err;
     }
+  }
 
     // Create the album document in the database
     this.model.create(albumDoc, (err: NativeError, album: Document) => {
@@ -140,6 +159,86 @@ class AlbumModel {
 
   public static getModel() {
     return this.model;
+  }
+
+  /**
+   * Fetches data for an album on Spotify.
+   * @param spotifyAlbumId Spotify ID of the album
+   */
+  private static async fetchSpotifyAlbumData(spotifyAlbumId: string): Promise<any> {
+    // Fetch album from Spotify
+    const spotifyAlbumResult: any = await fetchSpotifyAlbum(spotifyAlbumId);
+    const spotifyAlbum: any = spotifyAlbumResult.data;
+
+    // Fetch album's artists and their associated genres from Spotify
+    const artists: string[] = [];
+    const artistGenres: string[] = [];
+    for (const artist of spotifyAlbum.artists) {
+      const spotifyArtistResult: any = await fetchSpotifyArtist(artist.id);
+      const spotifyArtist: any = spotifyArtistResult.data;
+      artists.push(spotifyArtist.name);
+      artistGenres.push(...spotifyArtist.genres);
+    }
+
+    // Fetch album's tracks from Spotify
+    const spotifyTracksResult: any = await fetchSpotifyAlbumTracks(spotifyAlbum.id);
+    const spotifyTracks: any = spotifyTracksResult.data.items;
+
+    const pitchNotations: string[] = ['C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭', 'A', 'A♯/B♭', 'B'];
+
+    const trackPromises = spotifyTracks.map(async (track: any) => {
+      // Fetch tracks' audio features from Spotify
+      let audioFeatures: any = null;
+
+      try {
+        const spotifyAudioFeaturesResult: any = await fetchSpotifyAudioFeatures(track.id);
+        const spotifyAudioFeatures = spotifyAudioFeaturesResult.data;
+
+        const timeSignature: string = spotifyAudioFeatures.time_signature + '/4';
+        const mode: string = (spotifyAudioFeatures.mode === 1) ? 'major' : 'minor';
+        const key: string = (spotifyAudioFeatures.key === -1) ? 'N/A' : pitchNotations[spotifyAudioFeatures.key];
+
+        audioFeatures = {
+          tempo:            spotifyAudioFeatures.tempo,
+          timeSignature,
+          key,
+          mode,
+          acousticness:     spotifyAudioFeatures.acousticness,
+          energy:           spotifyAudioFeatures.energy,
+          danceability:     spotifyAudioFeatures.danceability,
+          instrumentalness: spotifyAudioFeatures.instrumentalness,
+          liveness:         spotifyAudioFeatures.liveness,
+          speechiness:      spotifyAudioFeatures.speechiness,
+          valence:          spotifyAudioFeatures.valence
+        };
+      } catch (err: any) {
+        // Ignore errors
+      }
+
+      return Promise.resolve({
+        title:       track.name,
+        diskNumber:  track.disc_number,
+        trackNumber: track.track_number,
+        duration:    track.duration_ms,
+        audioFeatures
+      });
+    });
+
+    const tracks: any = await Promise.all(trackPromises);
+
+    // Consolidate album data
+    const albumData: any = {
+      spotifyId:    spotifyAlbum.id,
+      title:        spotifyAlbum.name,
+      artists,
+      artistGenres,
+      trackCount:   spotifyAlbum.total_tracks,
+      releaseDate:  spotifyAlbum.release_date,
+      imageUrl:     spotifyAlbum.images[1].url,
+      tracks
+    }
+
+    return Promise.resolve(albumData);
   }
 
 }
