@@ -200,7 +200,7 @@ router.get('/api/album-search', async (req: Request, res: Response): Promise<voi
   }
 });
 
-router.get('/api/album', async (req: Request, res: Response): Promise<void> => {
+router.get('/api/spotify-album', async (req: Request, res: Response): Promise<void> => {
   if (!('spotifyAlbumId' in req.query)) {
     res.status(400);
     res.send('Missing required args: spotifyAlbumId');
