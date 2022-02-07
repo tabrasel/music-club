@@ -99,16 +99,6 @@ class AlbumModel {
     }
   }
 
-    // Create the album document in the database
-    this.model.create(albumDoc, (err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to create album");
-      } else {
-        res.json(album);
-      }
-    });
-  }
-
   /**
    * Update an existing album.
    */
