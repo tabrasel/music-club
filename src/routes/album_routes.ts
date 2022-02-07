@@ -21,8 +21,8 @@ router.post('/api/album', (req: Request, res: Response): void => {
   }
 
   AlbumModel.create(req.body.spotifyId, req.body.posterId)
-    .then((newAlbum: any) => {
-      res.json(newAlbum);
+    .then((createdAlbum: any) => {
+      res.json(createdAlbum);
     })
     .catch((err: any): void => {
       res.status(err.response.status || 500).send({

@@ -66,7 +66,7 @@ class AlbumModel {
   }
 
   /**
-   * Create a new album in the database.
+   * Creates a new album in the database.
    * @param spotifyAlbumId Spotify ID of the album
    * @param posterId       member ID of the album poster
    * @return the created album document
@@ -74,20 +74,20 @@ class AlbumModel {
   public static async create(spotifyAlbumId: string, posterId: string): Promise<any> {
     try {
       // Fetch album data
-      const spotifyAlbumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
+      const albumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
 
       // Define post data
       const postData: any = {
         posterId,
         topDiskNumber: null,
         topTrackNumber: null,
-        tracks: spotifyAlbumData.tracks.map((track: any): any => { return { ...track, pickerIds: [] }; })
+        tracks: albumData.tracks.map((track: any): any => { return { ...track, pickerIds: [] }; })
       };
 
-      // Create album document
+      // Define album document
       const albumDoc: any = {
         id: uuidv4(),
-        ...spotifyAlbumData,
+        ...albumData,
         ...postData
       };
 
