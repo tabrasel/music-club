@@ -47,7 +47,18 @@ router.delete('/api/album', (req: Request, res: Response) => {
     return;
   }
 
-  return AlbumModel.deleteAlbum(req, res);
+  return AlbumModel.delete(String(req.query.id))
+    .then((deletedAlbum: any): void => {
+      res.json(deletedAlbum);
+    })
+    .catch((err: any): void => {
+      res.status(err.response.status || 500).send({
+        error: {
+          status: err.response.status || 500,
+          message: err.response.statusText || 'Internal server error',
+        }
+      });
+    });
 });
 
 // Get an album
