@@ -121,16 +121,20 @@ class AlbumModel {
     });
   }
 
-  public static deleteAlbum(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
+  /**
+   * Deletes an album from the database.
+   * @param id ID of the album
+   * @return the deleted album
+   */
+  public static async delete(id: string): Promise<any> {
+    try {
+      const query: any = this.model.findOneAndDelete({ id });
+      const deletedAlbum: any = query.exec();
 
-    query.exec((err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to delete album");
-      } else {
-        res.json(album);
-      }
-    });
+      return Promise.resolve(deletedAlbum);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   /**
