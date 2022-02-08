@@ -25,7 +25,7 @@ import memberRoutes from './routes/member_routes';
 import memberInsightsRoutes from './routes/member_insights_routes';
 import roundRoutes from './routes/round_routes';
 import authRoutes from './routes/auth_routes';
-import spotifyRoutes from './routes/spotify_routes';
+import { router as spotifyRoutes } from './routes/spotify_routes';
 
 // Connect to database
 Database.connect();
