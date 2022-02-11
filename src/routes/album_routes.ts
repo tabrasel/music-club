@@ -69,7 +69,28 @@ router.get('/api/album', (req: Request, res: Response) => {
     return;
   }
 
-  return AlbumModel.getAlbum(req, res);
+  AlbumModel.get(String(req.query.id))
+    .then((album: any) => {
+      if (album === null) {
+        res.status(404).send({
+          error: {
+            status: 404,
+            message: 'Could not find requested album',
+          }
+        });
+        return;
+      }
+
+      res.json(album);
+    })
+    .catch((err: any): void => {
+      res.status(err.response.status || 500).send({
+        error: {
+          status: err.response.status || 500,
+          message: err.response.statusText || 'Internal server error',
+        }
+      });
+    });
 });
 
 export default router;

@@ -138,17 +138,19 @@ class AlbumModel {
   }
 
   /**
-   * Get a specified album.
+   * Gets an album from the database.
+   * @param id ID of the album
+   * @return the album
    */
-  public static getAlbum(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to get album");
-      } else {
-        res.json(album);
-      }
-    });
+  public static get(id: string): Promise<any> {
+    try {
+      const query: any = this.model.findOne({ id });
+      const album: any = query.exec();
+
+      return Promise.resolve(album);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   public static getModel() {
