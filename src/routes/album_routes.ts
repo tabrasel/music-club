@@ -21,7 +21,7 @@ router.post('/api/album', (req: Request, res: Response): void => {
   }
 
   AlbumModel.create(req.body.spotifyId, req.body.posterId)
-    .then((createdAlbum: any) => {
+    .then((createdAlbum: IAlbum): void => {
       res.json(createdAlbum);
     })
     .catch((err: any): void => {
@@ -35,7 +35,7 @@ router.post('/api/album', (req: Request, res: Response): void => {
 });
 
 // Update an existing album
-router.put('/api/album', (req: Request, res: Response) => {
+router.put('/api/album', (req: Request, res: Response): void => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
@@ -49,7 +49,7 @@ router.put('/api/album', (req: Request, res: Response) => {
   }
 
   AlbumModel.update(String(req.query.id), req.body)
-    .then((updatedAlbum: any): void => {
+    .then((updatedAlbum: IAlbum): void => {
       res.json(updatedAlbum);
     })
     .catch((err: any): void => {
@@ -63,7 +63,7 @@ router.put('/api/album', (req: Request, res: Response) => {
 })
 
 // Delete an existing album
-router.delete('/api/album', (req: Request, res: Response) => {
+router.delete('/api/album', (req: Request, res: Response): void => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
@@ -71,7 +71,7 @@ router.delete('/api/album', (req: Request, res: Response) => {
   }
 
   return AlbumModel.delete(String(req.query.id))
-    .then((deletedAlbum: any): void => {
+    .then((deletedAlbum: IAlbum): void => {
       res.json(deletedAlbum);
     })
     .catch((err: any): void => {
@@ -85,7 +85,7 @@ router.delete('/api/album', (req: Request, res: Response) => {
 });
 
 // Get an album
-router.get('/api/album', (req: Request, res: Response) => {
+router.get('/api/album', (req: Request, res: Response): void => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
@@ -93,8 +93,8 @@ router.get('/api/album', (req: Request, res: Response) => {
   }
 
   AlbumModel.get(String(req.query.id))
-    .then((album: any) => {
-      if (album === null) {
+    .then((foundAlbum: IAlbum): void => {
+      if (foundAlbum === null) {
         res.status(404).send({
           error: {
             status: 404,
@@ -104,7 +104,7 @@ router.get('/api/album', (req: Request, res: Response) => {
         return;
       }
 
-      res.json(album);
+      res.json(foundAlbum);
     })
     .catch((err: any): void => {
       res.status(err.response.status || 500).send({
