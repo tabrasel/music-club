@@ -36,8 +36,31 @@ router.post('/api/album', (req: Request, res: Response): void => {
 
 // Update an existing album
 router.put('/api/album', (req: Request, res: Response) => {
-  return AlbumModel.updateAlbum(req, res);
-});
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
+  if (req.body === null) {
+    res.status(400);
+    res.send('Missing required args: request body');
+    return;
+  }
+
+  AlbumModel.update(String(req.query.id), req.body)
+    .then((updatedAlbum: any): void => {
+      res.json(updatedAlbum);
+    })
+    .catch((err: any): void => {
+      res.status(err.response.status || 500).send({
+        error: {
+          status: err.response.status || 500,
+          message: err.response.statusText || 'Internal server error',
+        }
+      });
+    });
+})
 
 // Delete an existing album
 router.delete('/api/album', (req: Request, res: Response) => {
