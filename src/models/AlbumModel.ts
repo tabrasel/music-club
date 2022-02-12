@@ -71,7 +71,7 @@ class AlbumModel {
    * @param posterId       member ID of the album poster
    * @return the created album document
    */
-  public static async create(spotifyAlbumId: string, posterId: string): Promise<any> {
+  public static async create(spotifyAlbumId: string, posterId: string): Promise<IAlbum> {
     try {
       // Fetch album data
       const albumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
@@ -91,8 +91,8 @@ class AlbumModel {
         ...postData
       };
 
-      // Save document to database
-      const createdAlbum: any = this.model.create(albumDoc);
+      // Perform creation
+      const createdAlbum: IAlbum = this.model.create(albumDoc);
       return Promise.resolve(createdAlbum);
     } catch (err: any) {
       throw err;
@@ -105,7 +105,7 @@ class AlbumModel {
    * @param updateData update data
    * @return the deleted album
    */
-  public static async update(id: string, updateData: any): Promise<any> {
+  public static async update(id: string, updateData: any): Promise<IAlbum> {
     try {
       // Define update body
       let updateBody: any = {};
@@ -141,11 +141,10 @@ class AlbumModel {
    * @param id ID of the album
    * @return the deleted album
    */
-  public static async delete(id: string): Promise<any> {
+  public static async delete(id: string): Promise<IAlbum> {
     try {
-      const query: any = this.model.findOneAndDelete({ id });
-      const deletedAlbum: any = query.exec();
-
+      // Perform deletion
+      const deletedAlbum: any = await this.model.findOneAndDelete({ id });
       return Promise.resolve(deletedAlbum);
     } catch (err: any) {
       throw err;
@@ -157,12 +156,11 @@ class AlbumModel {
    * @param id ID of the album
    * @return the album
    */
-  public static get(id: string): Promise<any> {
+  public static async get(id: string): Promise<IAlbum> {
     try {
-      const query: any = this.model.findOne({ id });
-      const album: any = query.exec();
-
-      return Promise.resolve(album);
+      // Perform search
+      const foundAlbum: IAlbum = await this.model.findOne({ id });
+      return Promise.resolve(foundAlbum);
     } catch (err: any) {
       throw err;
     }
