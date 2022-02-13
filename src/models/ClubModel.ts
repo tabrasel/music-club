@@ -81,18 +81,13 @@ class ClubModel {
   }
 
   /**
-   * Delete an existing club.
+   * Deletes a club.
+   * @param id ID of the club to delete
+   * @return the deleted club
    */
-  public static deleteClub(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
-
-    query.exec((err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to delete club");
-      } else {
-        res.json(club);
-      }
-    });
+  public static async delete(id: string): Promise<IClub> {
+    const deletedClub: IClub = await this.model.findOneAndDelete({ id });
+    return Promise.resolve(deletedClub);
   }
 
   /**

@@ -17,15 +17,16 @@ router.put('/api/club', (req: Request, res: Response) => {
   return ClubModel.updateClub(req, res);
 });
 
-// Delete an existing club
-router.delete('/api/club', (req: Request, res: Response) => {
+// Delete a club
+router.delete('/api/club', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return ClubModel.deleteClub(req, res);
+  const deletedClub: any = await ClubModel.delete(String(req.query.id));
+  res.json(deletedClub);
 });
 
 // Get a club
