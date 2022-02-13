@@ -1,6 +1,9 @@
 // Import modules
 import { Request, Response, Router } from 'express';
 
+// Import interfaces
+import IAlbum from '../interfaces/IAlbum';
+
 // Import model
 import { AlbumModel } from '../models/AlbumModel';
 
