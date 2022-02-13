@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-* Query parameter validation to endpoints for: Albums, Clubs, Members, Rounds, Spotify
+* Query parameter validation to endpoints for: Albums, Clubs, Members, Rounds, Spotify.
 
 ## 1.7.0 - 2022-01-26
 
@@ -22,4 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 * `/api/spotify-album-tracks` endpoint.
 * `/api/spotify-audio-features` endpoint.
-* `tracks` and `topDiskNumber` fields to Album model.
+
+### Changed
+
+* Albums now store the additional fields: `artists`, `releaseDate`, `spotifyId`, `topDiskNumber`, `tracks`

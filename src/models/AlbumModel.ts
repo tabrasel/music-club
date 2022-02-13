@@ -71,7 +71,7 @@ class AlbumModel {
    * @param posterId       member ID of the album poster
    * @return the created album document
    */
-  public static async create(spotifyAlbumId: string, posterId: string): Promise<any> {
+  public static async create(spotifyAlbumId: string, posterId: string): Promise<IAlbum> {
     try {
       // Fetch album data
       const albumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
@@ -91,8 +91,8 @@ class AlbumModel {
         ...postData
       };
 
-      // Save document to database
-      const createdAlbum: any = this.model.create(albumDoc);
+      // Perform creation
+      const createdAlbum: IAlbum = await this.model.create(albumDoc);
       return Promise.resolve(createdAlbum);
     } catch (err: any) {
       throw err;
@@ -100,25 +100,42 @@ class AlbumModel {
   }
 
   /**
-   * Update an existing album.
+   * Updates an album in the database.
+   * @param id         ID of the album
+   * @param updateData update data
+   * @return the deleted album
    */
-  public static updateAlbum(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
+  public static async update(id: string, updateData: any): Promise<IAlbum> {
+    // TODO: make sure provided fields are valid in album interface
+    try {
+      // If spotifyId is included, update all album data and clear all post data except posterId. These updates will
+      // be overridden by matching fields in the given updateData
+      if ('spotifyId' in updateData) {
+        const albumUpdateData: any = await AlbumModel.fetchSpotifyAlbumData(updateData.spotifyId);
+        const postUpdateData: any = {
+          topDiskNumber: null,
+          topTrackNumber: null,
+          tracks: albumUpdateData.tracks.map((track: any) => { return { ...track, pickerIds: [] }; })
+        };
 
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedAlbum) => {
-      if (err) {
-        res.json("Failed to update album");
-      } else {
-        res.json(updatedAlbum);
+        updateData = {
+          ...albumUpdateData,
+          ...postUpdateData,
+          ...updateData
+        };
       }
-    });
+
+      // Perform update
+      const updatedAlbum: IAlbum = await this.model.findOneAndUpdate(
+        { id },
+        updateData,
+        { new: true, useFindAndModify: false }
+      );
+
+      return Promise.resolve(updatedAlbum);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   /**
@@ -126,11 +143,10 @@ class AlbumModel {
    * @param id ID of the album
    * @return the deleted album
    */
-  public static async delete(id: string): Promise<any> {
+  public static async delete(id: string): Promise<IAlbum> {
     try {
-      const query: any = this.model.findOneAndDelete({ id });
-      const deletedAlbum: any = query.exec();
-
+      // Perform deletion
+      const deletedAlbum: any = await this.model.findOneAndDelete({ id });
       return Promise.resolve(deletedAlbum);
     } catch (err: any) {
       throw err;
@@ -138,17 +154,18 @@ class AlbumModel {
   }
 
   /**
-   * Get a specified album.
+   * Gets an album from the database.
+   * @param id ID of the album
+   * @return the album
    */
-  public static getAlbum(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to get album");
-      } else {
-        res.json(album);
-      }
-    });
+  public static async get(id: string): Promise<IAlbum> {
+    try {
+      // Perform search
+      const foundAlbum: IAlbum = await this.model.findOne({ id });
+      return Promise.resolve(foundAlbum);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   public static getModel() {
