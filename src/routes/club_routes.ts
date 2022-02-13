@@ -6,9 +6,10 @@ import { ClubModel } from '../models/ClubModel';
 
 const router: Router = Router();
 
-// Create a new club
-router.post('/api/club', (req: Request, res: Response) => {
-  return ClubModel.createClub(req, res);
+// Create a club
+router.post('/api/club', async (req: Request, res: Response): Promise<void> => {
+  const createdClub: any = await ClubModel.create(req.body.name);
+  res.json(createdClub);
 });
 
 // Update an existing club

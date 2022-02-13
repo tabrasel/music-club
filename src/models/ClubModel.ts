@@ -34,27 +34,28 @@ class ClubModel {
   }
 
   /**
-   * Create a new club document in the database.
+   * Creates a club in the database.
+   * @param name name of the club
+   * @return the created club
    */
-  public static createClub(req: any, res: Response): void {
-    // Define a document for the club
-    const clubInfo = req.body;
-    const clubDoc: IClub = {
-      id: uuidv4(),
-      name: clubInfo.name,
-      currentRoundId: null,
-      participantIds: [],
-      roundIds: []
-    }
+  public static async create(name: string): Promise<IClub> {
+    try {
+      // Define club document
+      const clubDoc: IClub = {
+        id: uuidv4(),
+        name,
+        currentRoundId: null,
+        participantIds: [],
+        roundIds: []
+      };
 
-    // Create the club document in the database
-    this.model.create(clubDoc, (err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to create club");
-      } else {
-        res.json(club);
-      }
-    });
+      // Create club in database
+      const createdClub: IClub = await this.model.create(clubDoc);
+
+      return Promise.resolve(createdClub);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   /**
