@@ -30,14 +30,15 @@ router.delete('/api/club', async (req: Request, res: Response): Promise<void> =>
 });
 
 // Get a club
-router.get('/api/club', (req: Request, res: Response) => {
+router.get('/api/club', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return ClubModel.getClub(req, res);
+  const foundClub: any = await ClubModel.get(String(req.query.id));
+  res.json(foundClub);
 });
 
 // Get all clubs

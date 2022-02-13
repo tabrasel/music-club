@@ -91,17 +91,13 @@ class ClubModel {
   }
 
   /**
-   * Get a specified club.
+   * Gets an album.
+   * @param id ID of the club to get
+   * @return the specified album
    */
-  public static getClub(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to get club");
-      } else {
-        res.json(club);
-      }
-    });
+  public static async get(id: string): Promise<IClub> {
+    const foundClub: IClub = await this.model.findOne({ id });
+    return Promise.resolve(foundClub);
   }
 
   /**
