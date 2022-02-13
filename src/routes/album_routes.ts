@@ -70,7 +70,7 @@ router.delete('/api/album', (req: Request, res: Response): void => {
     return;
   }
 
-  return AlbumModel.delete(String(req.query.id))
+  AlbumModel.delete(String(req.query.id))
     .then((deletedAlbum: IAlbum): void => {
       res.json(deletedAlbum);
     })
