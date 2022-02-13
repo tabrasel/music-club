@@ -92,7 +92,7 @@ class AlbumModel {
       };
 
       // Perform creation
-      const createdAlbum: IAlbum = this.model.create(albumDoc);
+      const createdAlbum: IAlbum = await this.model.create(albumDoc);
       return Promise.resolve(createdAlbum);
     } catch (err: any) {
       throw err;
