@@ -106,27 +106,29 @@ class AlbumModel {
    * @return the deleted album
    */
   public static async update(id: string, updateData: any): Promise<IAlbum> {
+    // TODO: make sure provided fields are valid in album interface
     try {
-      // Define update body
-      let updateBody: any = {};
-
-      // If spotifyId is included, update all album fields and clear out all post-related fields except posterId
+      // If spotifyId is included, update all album data and clear all post data except posterId. These updates will
+      // be overridden by matching fields in the given updateData
       if ('spotifyId' in updateData) {
-        updateBody = await AlbumModel.fetchSpotifyAlbumData(updateData.spotifyId);
-        updateBody.topDiskNumber = null;
-        updateBody.topTrackNumber = null;
-        updateBody.tracks = updateBody.tracks.map((track: any) => { return { ...track, pickerIds: [] }; });
-      }
+        const albumUpdateData: any = await AlbumModel.fetchSpotifyAlbumData(updateData.spotifyId);
+        const postUpdateData: any = {
+          topDiskNumber: null,
+          topTrackNumber: null,
+          tracks: albumUpdateData.tracks.map((track: any) => { return { ...track, pickerIds: [] }; })
+        };
 
-      // If anything else needs updating, set the corresponding fields (overrides any updates done as a result of
-      // changing spotifyId)
-      // TODO: make sure provided fields are valid in album interface
-      updateBody = { ...updateBody, updateData };
+        updateData = {
+          ...albumUpdateData,
+          ...postUpdateData,
+          ...updateData
+        };
+      }
 
       // Perform update
       const updatedAlbum: IAlbum = await this.model.findOneAndUpdate(
         { id },
-        updateBody,
+        updateData,
         { new: true, useFindAndModify: false }
       );
 
