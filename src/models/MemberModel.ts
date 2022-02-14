@@ -52,25 +52,13 @@ class MemberModel {
   }
 
   /**
-   * Update an existing member.
+   * Updates a member.
+   * @param id ID of the member to update
+   * @return the updated member
    */
-  public static updateMember(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
-
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedMember) => {
-      if (err) {
-        res.json("Failed to update member");
-      } else {
-        res.json(updatedMember);
-      }
-    });
+  public static async update(id: string, updateData: any): Promise<IMember> {
+    const updatedMember: IMember = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+    return Promise.resolve(updatedMember);
   }
 
   /**

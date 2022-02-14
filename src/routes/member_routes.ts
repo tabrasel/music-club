@@ -12,9 +12,10 @@ router.post('/api/member', async (req: Request, res: Response): Promise<void> =>
   res.json(createdMember);
 });
 
-// Update an existing member
-router.put('/api/member', (req: Request, res: Response) => {
-  return MemberModel.updateMember(req, res);
+// Update a member
+router.put('/api/member', async (req: Request, res: Response): Promise<void> => {
+  const updatedMember: any = await MemberModel.update(String(req.query.id), req.body);
+  res.json(updatedMember);
 });
 
 // Delete an existing member
