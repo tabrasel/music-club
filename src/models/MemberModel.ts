@@ -28,28 +28,27 @@ class MemberModel {
   }
 
   /**
-   * Create a new member document in the database.
+   * Creates a member in the database.
+   * @param firstName first name
+   * @param lastName last name
+   * @param color color
+   * @return the created member
    */
-  public static createMember(req: any, res: Response): void {
-    // Define a document for the member
-    const memberInfo = req.body;
+  public static async create(firstName: string, lastName: string, color: string) {
+    // Define member document
     const memberDoc: IMember = {
       id: uuidv4(),
-      firstName: memberInfo.firstName,
-      lastName: memberInfo.lastName,
-      color: memberInfo.color,
+      firstName,
+      lastName,
+      color,
       participatedRoundIds: [],
       postedAlbumIds: []
     }
 
-    // Create the member document in the database
-    this.model.create(memberDoc, (err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to create member");
-      } else {
-        res.json(member);
-      }
-    });
+    // Create member in database
+    const createdMember: IMember = await this.model.create(memberDoc);
+
+    return Promise.resolve(createdMember);
   }
 
   /**

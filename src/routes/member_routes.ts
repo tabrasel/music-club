@@ -6,9 +6,10 @@ import { MemberModel } from '../models/MemberModel';
 
 const router: Router = Router();
 
-// Create a new member
-router.post('/api/member', (req: Request, res: Response) => {
-  return MemberModel.createMember(req, res);
+// Create a member
+router.post('/api/member', async (req: Request, res: Response): Promise<void> => {
+  const createdMember: any = await MemberModel.create(req.body.firstName, req.body.lastName, req.body.color);
+  res.json(createdMember);
 });
 
 // Update an existing member
