@@ -18,15 +18,16 @@ router.put('/api/member', async (req: Request, res: Response): Promise<void> => 
   res.json(updatedMember);
 });
 
-// Delete an existing member
-router.delete('/api/member', (req: Request, res: Response) => {
+// Delete a member
+router.delete('/api/member', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return MemberModel.deleteMember(req, res);
+  const deletedMember: any = await MemberModel.delete(String(req.query.id));
+  res.json(deletedMember);
 });
 
 // Get a member

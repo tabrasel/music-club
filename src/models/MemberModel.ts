@@ -30,8 +30,8 @@ class MemberModel {
   /**
    * Creates a member in the database.
    * @param firstName first name
-   * @param lastName last name
-   * @param color color
+   * @param lastName  last name
+   * @param color     color
    * @return the created member
    */
   public static async create(firstName: string, lastName: string, color: string) {
@@ -62,18 +62,13 @@ class MemberModel {
   }
 
   /**
-   * Delete an existing member.
+   * Deletes a member.
+   * @param id ID of the member to delete
+   * @return the deleted member
    */
-  public static deleteMember(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
-
-    query.exec((err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to delete member");
-      } else {
-        res.json(member);
-      }
-    });
+  public static async delete(id: string): Promise<IMember> {
+    const deletedMember: IMember = await this.model.findOneAndDelete({ id });
+    return Promise.resolve(deletedMember);
   }
 
   /**
