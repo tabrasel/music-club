@@ -28,90 +28,65 @@ class MemberModel {
   }
 
   /**
-   * Create a new member document in the database.
+   * Creates a member in the database.
+   * @param firstName first name
+   * @param lastName  last name
+   * @param color     color
+   * @return the created member
    */
-  public static createMember(req: any, res: Response): void {
-    // Define a document for the member
-    const memberInfo = req.body;
+  public static async create(firstName: string, lastName: string, color: string) {
+    // Define member document
     const memberDoc: IMember = {
       id: uuidv4(),
-      firstName: memberInfo.firstName,
-      lastName: memberInfo.lastName,
-      color: memberInfo.color,
+      firstName,
+      lastName,
+      color,
       participatedRoundIds: [],
       postedAlbumIds: []
     }
 
-    // Create the member document in the database
-    this.model.create(memberDoc, (err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to create member");
-      } else {
-        res.json(member);
-      }
-    });
+    // Create member in database
+    const createdMember: IMember = await this.model.create(memberDoc);
+
+    return Promise.resolve(createdMember);
   }
 
   /**
-   * Update an existing member.
+   * Updates a member.
+   * @param id ID of the member to update
+   * @return the updated member
    */
-  public static updateMember(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
-
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedMember) => {
-      if (err) {
-        res.json("Failed to update member");
-      } else {
-        res.json(updatedMember);
-      }
-    });
+  public static async update(id: string, updateData: any): Promise<IMember> {
+    const updatedMember: IMember = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+    return Promise.resolve(updatedMember);
   }
 
   /**
-   * Delete an existing member.
+   * Deletes a member.
+   * @param id ID of the member to delete
+   * @return the deleted member
    */
-  public static deleteMember(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
-
-    query.exec((err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to delete member");
-      } else {
-        res.json(member);
-      }
-    });
+  public static async delete(id: string): Promise<IMember> {
+    const deletedMember: IMember = await this.model.findOneAndDelete({ id });
+    return Promise.resolve(deletedMember);
   }
 
   /**
-   * Get a specified member.
+   * Gets a member.
+   * @param id ID of the member to get
+   * @return the specified member
    */
-  public static getMember(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to get member");
-      } else {
-        res.json(member);
-      }
-    });
+  public static async get(id: string): Promise<IMember> {
+    const foundMember: IMember = await this.model.findOne({ id });
+    return Promise.resolve(foundMember);
   }
 
   /**
-   * Get all members.
+   * Gets all members.
    */
-  public static getAllMembers(res: any): any {
-    const query = this.model.find({});
-    query.exec((err, members) => {
-      if (err) res.json("Failed to get all members");
-      res.json(members);
-    });
+  public static async getAll(): Promise<IMember[]> {
+    const allMembers: IMember[] = await this.model.find({});
+    return Promise.resolve(allMembers);
   }
 
   public static getModel() {
