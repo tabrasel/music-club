@@ -43,8 +43,9 @@ router.get('/api/club', async (req: Request, res: Response): Promise<void> => {
 });
 
 // Get all clubs
-router.get('/api/clubs', (req: Request, res: Response) => {
-  return ClubModel.getAllClubs(res);
+router.get('/api/clubs', async (req: Request, res: Response): Promise<void> => {
+  const allClubs: any[] = await ClubModel.getAll();
+  res.json(allClubs);
 });
 
 export default router;

@@ -79,9 +79,9 @@ class ClubModel {
   }
 
   /**
-   * Gets an album.
+   * Gets a club.
    * @param id ID of the club to get
-   * @return the specified album
+   * @return the specified club
    */
   public static async get(id: string): Promise<IClub> {
     const foundClub: IClub = await this.model.findOne({ id });
@@ -89,14 +89,11 @@ class ClubModel {
   }
 
   /**
-   * Get all clubs.
+   * Gets all clubs.
    */
-  public static getAllClubs(res: any): any {
-    const query = this.model.find({});
-    query.exec((err, clubs) => {
-      if (err) res.json("Failed to get all clubs");
-      res.json(clubs);
-    });
+  public static async getAll(): Promise<IClub[]> {
+    const allClubs: IClub[] = await this.model.find({});
+    return Promise.resolve(allClubs);
   }
 
   public static getModel() {
