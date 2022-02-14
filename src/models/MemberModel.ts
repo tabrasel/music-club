@@ -72,28 +72,21 @@ class MemberModel {
   }
 
   /**
-   * Get a specified member.
+   * Gets a member.
+   * @param id ID of the member to get
+   * @return the specified member
    */
-  public static getMember(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, member: Document) => {
-      if (err) {
-        res.json("Failed to get member");
-      } else {
-        res.json(member);
-      }
-    });
+  public static async get(id: string): Promise<IMember> {
+    const foundMember: IMember = await this.model.findOne({ id });
+    return Promise.resolve(foundMember);
   }
 
   /**
-   * Get all members.
+   * Gets all members.
    */
-  public static getAllMembers(res: any): any {
-    const query = this.model.find({});
-    query.exec((err, members) => {
-      if (err) res.json("Failed to get all members");
-      res.json(members);
-    });
+  public static async getAll(): Promise<IMember[]> {
+    const allMembers: IMember[] = await this.model.find({});
+    return Promise.resolve(allMembers);
   }
 
   public static getModel() {

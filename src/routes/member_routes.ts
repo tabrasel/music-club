@@ -31,19 +31,21 @@ router.delete('/api/member', async (req: Request, res: Response): Promise<void> 
 });
 
 // Get a member
-router.get('/api/member', (req: Request, res: Response) => {
+router.get('/api/member', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return MemberModel.getMember(req, res);
+  const foundMember: any = await MemberModel.get(String(req.query.id));
+  res.json(foundMember);
 });
 
 // Get all members
-router.get('/api/members', (req: Request, res: Response) => {
-  return MemberModel.getAllMembers(res);
+router.get('/api/members', async (req: Request, res: Response): Promise<void> => {
+  const allMembers: any[] = await MemberModel.getAll();
+  res.json(allMembers);
 });
 
 export default router;
