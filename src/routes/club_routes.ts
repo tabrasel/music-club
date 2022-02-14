@@ -12,9 +12,10 @@ router.post('/api/club', async (req: Request, res: Response): Promise<void> => {
   res.json(createdClub);
 });
 
-// Update an existing club
-router.put('/api/club', (req: Request, res: Response) => {
-  return ClubModel.updateClub(req, res);
+// Update a club
+router.put('/api/club', async (req: Request, res: Response): Promise<void> => {
+  const updatedClub: any = await ClubModel.update(String(req.query.id), req.body);
+  res.json(updatedClub);
 });
 
 // Delete a club

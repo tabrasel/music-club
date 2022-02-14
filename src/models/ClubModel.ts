@@ -59,25 +59,13 @@ class ClubModel {
   }
 
   /**
-   * Update an existing club.
+   * Updates a club.
+   * @param id ID of the club to update
+   * @return the updated club
    */
-  public static updateClub(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
-
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedClub) => {
-      if (err) {
-        res.json("Failed to update club");
-      } else {
-        res.json(updatedClub);
-      }
-    });
+  public static async update(id: string, updateData: any): Promise<IClub> {
+    const updatedClub: IClub = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+    return Promise.resolve(updatedClub);
   }
 
   /**
