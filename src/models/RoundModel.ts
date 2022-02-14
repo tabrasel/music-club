@@ -34,104 +34,67 @@ class RoundModel {
     this.model = model<IRound>('Round', schema);
   }
 
-  /**
-   * Create a new round document.
-   */
-  public static async createRound(req: any, res: Response): Promise<void> {
-    // Define a document for the round
-    const roundInfo = req.body;
-
+  public static async create(num: number, description: string, participantIds: string[], startDate: string, endDate: string, picksPerParticipant: number): Promise<IRound> {
     // Sort participants
-    roundInfo.participantIds = await MemberModel.sortMemberIds(roundInfo.participantIds);
+    participantIds = await MemberModel.sortMemberIds(participantIds);
 
+    // Define round document
     const roundDoc: IRound = {
-      id: uuidv4(),
-      number: roundInfo.number,
-      description: roundInfo.description,
-      participantIds: roundInfo.participantIds,
-      albumIds: [],
-      startDate: roundInfo.startDate,
-      endDate: roundInfo.endDate,
-      picksPerParticipant: roundInfo.picksPerParticipant,
+      id:                 uuidv4(),
+      number:             num,
+      description,
+      participantIds,
+      albumIds:           [],
+      startDate,
+      endDate,
+      picksPerParticipant
     }
 
-    // Create the round document in the database
-    this.model.create(roundDoc, (err: NativeError, round: Document) => {
-      if (err) {
-        res.json("Failed to create round");
-      } else {
-        // Generate thumbnail
-        RoundThumbnailManager.generateThumbnail(roundDoc, 400);
+    // Create round in database
+    const createdRound: IRound = await this.model.create(roundDoc);
 
-        res.json(round);
-      }
-    });
+    // Generate thumbnail image
+    RoundThumbnailManager.generateThumbnail(roundDoc, 400);
+
+    return Promise.resolve(createdRound);
   }
 
   /**
-   * Update an existing round.
+   * Updates a round.
+   * @param id ID of the round to update
+   * @return the updated round
    */
-  public static updateRound(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-
-    // Define and execute update query
-    const update: any = req.body;
-    const updateQuery = this.model.findOneAndUpdate(filter, update, { new: true, useFindAndModify: false });
-    updateQuery.exec((updateError: NativeError, updatedRound) => {
-      if (updateError) {
-        res.json("Failed to update round");
-      } else {
-        // Regenerate thumbnail
-        RoundThumbnailManager.generateThumbnail(updatedRound, 400);
-
-        res.json(updatedRound);
-      }
-    });
+  public static async update(id: string, updateData: any): Promise<IRound> {
+    const updatedRound: IRound = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+    return Promise.resolve(updatedRound);
   }
 
   /**
-   * Delete an existing round.
+   * Deletes a round.
+   * @param id ID of the round to delete
+   * @return the deleted round
    */
-  public static deleteRound(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-
-    // Define and execute delete query
-    const deleteQuery: any = this.model.findOneAndDelete(filter);
-    deleteQuery.exec((deleteError: NativeError, deletedRound: Document) => {
-      if (deleteError) {
-        res.json("Failed to delete round");
-      } else {
-        // Delete thumbnail
-        RoundThumbnailManager.deleteThumbnail(deletedRound.id);
-
-        res.json(deletedRound);
-      }
-    });
+  public static async delete(id: string): Promise<IRound> {
+    const deletedRound: IRound = await this.model.findOneAndDelete({ id });
+    return Promise.resolve(deletedRound);
   }
 
   /**
-   * Get a specified round from the database.
+   * Gets a round.
+   * @param id ID of the round to get
+   * @return the specified round
    */
-  public static getRound(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, round: Document) => {
-      if (err) {
-        res.json("Failed to get round");
-      } else {
-        res.json(round);
-      }
-    });
+  public static async get(id: string): Promise<IRound> {
+    const foundRound: IRound = await this.model.findOne({ id });
+    return Promise.resolve(foundRound);
   }
 
   /**
-   * Get all rounds.
+   * Gets all rounds.
    */
-  public static getAllRounds(res: any): any {
-    const query = this.model.find({});
-    query.exec((err, rounds) => {
-      if (err) res.json("Failed to get all rounds");
-      res.json(rounds);
-    });
+  public static async getAll(): Promise<IRound[]> {
+    const allRounds: IRound[] = await this.model.find({});
+    return Promise.resolve(allRounds);
   }
 
   public static getModel() {
