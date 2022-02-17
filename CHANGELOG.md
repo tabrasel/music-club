@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 2.0.0 - 2022-02-16
+
 ### Added
 
 * `/api/spotify-album` endpoint.
+
+### Changed
+
+* `GET` endpoints now return non-mongoose-hydrated plain old JavaScript objects.
 
 ## 1.8.0 - 2022-01-30
 
