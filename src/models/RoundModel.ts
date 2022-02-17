@@ -85,7 +85,7 @@ class RoundModel {
    * @return the specified round
    */
   public static async get(id: string): Promise<IRound> {
-    const foundRound: IRound = await this.model.findOne({ id });
+    const foundRound: IRound = await this.model.findOne({ id }).lean();
     return Promise.resolve(foundRound);
   }
 
@@ -93,7 +93,7 @@ class RoundModel {
    * Gets all rounds.
    */
   public static async getAll(): Promise<IRound[]> {
-    const allRounds: IRound[] = await this.model.find({});
+    const allRounds: IRound[] = await this.model.find({}).lean();
     return Promise.resolve(allRounds);
   }
 
