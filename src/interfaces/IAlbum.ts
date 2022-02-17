@@ -30,9 +30,9 @@ interface IAlbum {
       liveness: number,
       speechiness: number,
       valence: number
-    }[],
+    },
     pickerIds: string[]
-  },
+  }[],
   topDiskNumber: number,
   topTrackNumber: number
 }
