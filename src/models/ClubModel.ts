@@ -84,7 +84,7 @@ class ClubModel {
    * @return the specified club
    */
   public static async get(id: string): Promise<IClub> {
-    const foundClub: IClub = await this.model.findOne({ id });
+    const foundClub: IClub = await this.model.findOne({ id }).lean();
     return Promise.resolve(foundClub);
   }
 
@@ -92,7 +92,7 @@ class ClubModel {
    * Gets all clubs.
    */
   public static async getAll(): Promise<IClub[]> {
-    const allClubs: IClub[] = await this.model.find({});
+    const allClubs: IClub[] = await this.model.find({}).lean();
     return Promise.resolve(allClubs);
   }
 

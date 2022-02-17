@@ -66,7 +66,7 @@ class AlbumModel {
   }
 
   /**
-   * Creates a new album in the database.
+   * Creates an album.
    * @param spotifyAlbumId Spotify ID of the album
    * @param posterId       member ID of the album poster
    * @return the created album document
@@ -100,7 +100,7 @@ class AlbumModel {
   }
 
   /**
-   * Updates an album in the database.
+   * Updates an album.
    * @param id         ID of the album
    * @param updateData update data
    * @return the deleted album
@@ -139,7 +139,7 @@ class AlbumModel {
   }
 
   /**
-   * Deletes an album from the database.
+   * Deletes an album.
    * @param id ID of the album
    * @return the deleted album
    */
@@ -154,14 +154,14 @@ class AlbumModel {
   }
 
   /**
-   * Gets an album from the database.
+   * Gets an album.
    * @param id ID of the album
    * @return the album
    */
   public static async get(id: string): Promise<IAlbum> {
     try {
       // Perform search
-      const foundAlbum: IAlbum = await this.model.findOne({ id });
+      const foundAlbum: IAlbum = await this.model.findOne({ id }).lean();
       return Promise.resolve(foundAlbum);
     } catch (err: any) {
       throw err;

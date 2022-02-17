@@ -77,7 +77,7 @@ class MemberModel {
    * @return the specified member
    */
   public static async get(id: string): Promise<IMember> {
-    const foundMember: IMember = await this.model.findOne({ id });
+    const foundMember: IMember = await this.model.findOne({ id }).lean();
     return Promise.resolve(foundMember);
   }
 
@@ -85,7 +85,7 @@ class MemberModel {
    * Gets all members.
    */
   public static async getAll(): Promise<IMember[]> {
-    const allMembers: IMember[] = await this.model.find({});
+    const allMembers: IMember[] = await this.model.find({}).lean();
     return Promise.resolve(allMembers);
   }
 
