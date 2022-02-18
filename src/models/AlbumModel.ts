@@ -168,6 +168,14 @@ class AlbumModel {
     }
   }
 
+  /**
+   * Gets all albums.
+   */
+  public static async getAll(): Promise<IAlbum[]> {
+    const allAlbums: IAlbum[] = await this.model.find({}).lean();
+    return Promise.resolve(allAlbums);
+  }
+
   public static getModel() {
     return this.model;
   }
