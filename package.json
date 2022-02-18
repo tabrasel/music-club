@@ -12,7 +12,8 @@
     "setRoundParticipantIds": "node dist/scripts/setRoundParticipantIds.js",
     "sortRoundParticipants": "node dist/scripts/sortRoundParticipants.js",
     "sortRoundAlbums": "node dist/scripts/sortRoundAlbums.js",
-    "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js"
+    "generateRoundThumbnails": "node dist/scripts/generateRoundThumbnails.js",
+    "transferPickData": "node dist/scripts/transferPickData.js"
   },
   "repository": {
     "type": "git",
