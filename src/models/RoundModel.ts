@@ -40,11 +40,11 @@ class RoundModel {
 
     // Define round document
     const roundDoc: IRound = {
-      id:                 uuidv4(),
-      number:             num,
+      id: uuidv4(),
+      number: num,
       description,
       participantIds,
-      albumIds:           [],
+      albumIds: [],
       startDate,
       endDate,
       picksPerParticipant
@@ -54,7 +54,7 @@ class RoundModel {
     const createdRound: IRound = await this.model.create(roundDoc);
 
     // Generate thumbnail image
-    RoundThumbnailManager.generateThumbnail(roundDoc, 400);
+    RoundThumbnailManager.generateThumbnail(createdRound, 400);
 
     return Promise.resolve(createdRound);
   }
@@ -66,6 +66,11 @@ class RoundModel {
    */
   public static async update(id: string, updateData: any): Promise<IRound> {
     const updatedRound: IRound = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+
+    // Regenerate thumbnail image if necessary
+    if ('participantIds' in updateData || 'albumIds' in updateData)
+      RoundThumbnailManager.generateThumbnail(updatedRound, 400);
+
     return Promise.resolve(updatedRound);
   }
 
