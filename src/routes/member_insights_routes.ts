@@ -59,10 +59,11 @@ async function countSharedClubVotes(memberId: string, clubId: string): Promise<a
     });
 
     for (const album of albums) {
-      for (const pickedTrack of album.pickedTracks) {
-        if (!pickedTrack.pickerIds.includes(memberId)) continue;
-        for (const pickerId of pickedTrack.pickerIds) {
-          if (pickerId !== memberId) sharedVotesMap.set(pickerId, sharedVotesMap.get(pickerId) + 1);
+      for (const track of album.tracks) {
+        if (track.pickerIds.length === 0 || !track.pickerIds.includes(memberId)) continue;
+        for (const pickerId of track.pickerIds) {
+          if (pickerId !== memberId)
+            sharedVotesMap.set(pickerId, sharedVotesMap.get(pickerId) + 1);
         }
       }
     }
