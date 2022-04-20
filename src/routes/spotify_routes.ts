@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosPromise, AxiosResponse } from 'axios';
 import { Request, Response, Router } from 'express';
 import store from 'store2';
 
-const router: Router = Router();
+// Helper functions
 
 /**
  * Update the server's Spotify API access token.
@@ -29,56 +29,44 @@ async function updateAccessToken(): Promise<void> {
 }
 
 /**
- * Make a request to the Spotify API. If the initial request was unauthorized, try updating the access  token and retry
+ * Make a request to the Spotify API. If the initial request was unauthorized, try updating the access token and retry
  * the request.
  * @param reqFun request function to perform
- * @param res    result object of the route which called this function
  */
-async function makeSpotifyRequest(reqFun: any, res: Response): Promise<void> {
+async function makeSpotifyRequest(reqFun: any): Promise<any> {
   try {
-    await reqFun();
+    return Promise.resolve(await reqFun());
   } catch(err) {
     // Only retry the request if there was an authorization error
     if (err.response.status !== 401) {
-      res.status(err.response.status);
-      res.send(err.response.statusText);
-      return;
+      throw err;
     }
 
     // Try updating the access token
     try {
       await updateAccessToken();
     } catch(tokenErr) {
-      res.status(tokenErr.response.status);
-      res.send(tokenErr.response.statusText);
-      return;
+      throw err;
     }
 
     // Retry the request
     try {
-      await reqFun();
+      return Promise.resolve(await reqFun());
     } catch(retryErr) {
-      res.status(retryErr.response.status);
-      res.send(retryErr.response.statusText);
+      throw err;
     }
   }
 }
 
-// TODO: Make the search endpoint more generic. Let the client define the item type.
-
 /**
- * Endpoint for making a Spotify API album search request.
+ * Fetches album search results from Spotify.
+ * @param searchQuery the term to search for
+ * @return a promise for a Spotify search result
  */
-router.get('/api/album-search', async (req: Request, res: Response): Promise<void> => {
-  if (!('q' in req.query)) {
-    res.status(400);
-    res.send('Missing required args: q');
-    return;
-  }
+async function fetchSpotifyAlbumSearch(searchQuery: string): Promise<any> {
+  const encodedQuery: string = encodeURIComponent(searchQuery.toString());
 
-  const encodedQuery: string = encodeURIComponent(req.query.q.toString());
-
-  const requestFun = async (): Promise<void> => {
+  const requestFun = async (): Promise<any> => {
     const searchResult: any = await axios({
       url: `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=10`,
       headers: {
@@ -90,25 +78,21 @@ router.get('/api/album-search', async (req: Request, res: Response): Promise<voi
       }
     });
 
-    res.json(searchResult.data.albums);
+    return Promise.resolve(searchResult);
   };
 
-  makeSpotifyRequest(requestFun, res);
-});
+  return await makeSpotifyRequest(requestFun);
+}
 
 /**
- * Endpoint for making a Spotify API artist request.
+ * Fetches an album from Spotify.
+ * @param spotifyAlbumId the Spotify ID of the album
+ * @return a promise for a Spotify album
  */
-router.get('/api/artist', async (req: Request, res: Response): Promise<void> => {
-  if (!('id' in req.query)) {
-    res.status(400);
-    res.send('Missing required args: id');
-    return;
-  }
-
-  const requestFun = async (): Promise<void> => {
-    const artistResult: AxiosResponse = await axios({
-      url: `https://api.spotify.com/v1/artists/${req.query.id}`,
+async function fetchSpotifyAlbum(spotifyAlbumId: string): Promise<any> {
+  const requestFun = async (): Promise<any> => {
+    const albumResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/albums/${spotifyAlbumId}`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -118,15 +102,120 @@ router.get('/api/artist', async (req: Request, res: Response): Promise<void> => 
       }
     });
 
-   res.json(artistResult.data);
- };
+    return Promise.resolve(albumResult);
+  };
 
- makeSpotifyRequest(requestFun, res);
-});
+  return await makeSpotifyRequest(requestFun);
+}
 
 /**
- * Endpoint for making a Spotify API album tracks request.
+ * Fetches an album's tracks from Spotify.
+ * @param spotifyAlbumId the Spotify ID of the album
+ * @return a promise for a list of Spotify tracks
  */
+async function fetchSpotifyAlbumTracks(spotifyAlbumId: string): Promise<any> {
+  const requestFun = async (): Promise<any> => {
+    const tracksResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/albums/${spotifyAlbumId}/tracks`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: store.get('spotifyAccessToken')
+      }
+    });
+
+    return Promise.resolve(tracksResult);
+  };
+
+  return await makeSpotifyRequest(requestFun);
+}
+
+/**
+ * Fetches an artist from Spotify.
+ * @param spotifyArtistId the Spotify ID of the artist
+ * @return a promise for a Spotify artist
+ */
+async function fetchSpotifyArtist(spotifyArtistId: string): Promise<any> {
+  const requestFun = async (): Promise<any> => {
+    const artistResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/artists/${spotifyArtistId}`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: store.get('spotifyAccessToken')
+      }
+    });
+
+    return Promise.resolve(artistResult);
+  };
+
+  return await makeSpotifyRequest(requestFun);
+}
+
+/**
+ * Fetches a track's audio features from Spotify.
+ * @param spotifyTrackId the Spotify ID of the artist
+ * @return a promise for a track's audio features
+ */
+async function fetchSpotifyAudioFeatures(spotifyTrackId: string): Promise<any> {
+  const requestFun = async (): Promise<any> => {
+    const audioFeaturesResult: AxiosResponse = await axios({
+      url: `https://api.spotify.com/v1/audio-features/${spotifyTrackId}`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        access_token: store.get('spotifyAccessToken')
+      }
+    });
+
+    return Promise.resolve(audioFeaturesResult);
+  };
+
+  return await makeSpotifyRequest(requestFun);
+}
+
+// Endpoints
+
+const router: Router = Router();
+
+router.get('/api/album-search', async (req: Request, res: Response): Promise<void> => {
+  if (!('q' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: q');
+    return;
+  }
+
+  try {
+    const searchResult: any = await fetchSpotifyAlbumSearch(String(req.query.q));
+    res.json(searchResult.data.albums);
+  } catch(err) {
+    res.status(err.response.status);
+    res.send(err.response.statusText);
+  }
+});
+
+router.get('/api/spotify-album', async (req: Request, res: Response): Promise<void> => {
+  if (!('spotifyAlbumId' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: spotifyAlbumId');
+    return;
+  }
+
+  try {
+    const albumResult: any = await fetchSpotifyAlbum(String(req.query.spotifyAlbumId));
+    res.json(albumResult.data);
+  } catch(err) {
+    res.status(err.response.status);
+    res.send(err.response.statusText);
+  }
+});
+
 router.get('/api/spotify-album-tracks', async (req: Request, res: Response): Promise<void> => {
   if (!('spotifyAlbumId' in req.query)) {
     res.status(400);
@@ -134,27 +223,31 @@ router.get('/api/spotify-album-tracks', async (req: Request, res: Response): Pro
     return;
   }
 
-  const requestFun = async (): Promise<void> => {
-    const tracksResult: AxiosResponse = await axios({
-      url: `https://api.spotify.com/v1/albums/${req.query.spotifyAlbumId}/tracks`,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      params: {
-        access_token: store.get('spotifyAccessToken')
-      }
-    });
-
+  try {
+    const tracksResult: any = await fetchSpotifyAlbumTracks(String(req.query.spotifyAlbumId));
     res.json(tracksResult.data);
-  };
-
-  makeSpotifyRequest(requestFun, res);
+  } catch(err) {
+    res.status(err.response.status);
+    res.send(err.response.statusText);
+  }
 });
 
-/**
- * Endpoint for making a Spotify API audio features request.
- */
+router.get('/api/artist', async (req: Request, res: Response): Promise<void> => {
+  if (!('id' in req.query)) {
+    res.status(400);
+    res.send('Missing required args: id');
+    return;
+  }
+
+  try {
+    const artistResult: any = await fetchSpotifyArtist(String(req.query.id));
+    res.json(artistResult.data);
+  } catch(err) {
+    res.status(err.response.status);
+    res.send(err.response.statusText);
+  }
+});
+
 router.get('/api/spotify-audio-features', async (req: Request, res: Response) => {
   if (!('spotifyTrackId' in req.query)) {
     res.status(400);
@@ -162,22 +255,13 @@ router.get('/api/spotify-audio-features', async (req: Request, res: Response) =>
     return;
   }
 
-  const requestFun = async (): Promise<void> => {
-    const audioFeaturesResult: AxiosResponse = await axios({
-      url: `https://api.spotify.com/v1/audio-features/${req.query.spotifyTrackId}`,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      params: {
-        access_token: store.get('spotifyAccessToken')
-      }
-    });
-
+  try {
+    const audioFeaturesResult: any = await fetchSpotifyAudioFeatures(String(req.query.spotifyTrackId));
     res.json(audioFeaturesResult.data);
-  };
-
-  makeSpotifyRequest(requestFun, res);
+  } catch(err) {
+    res.status(err.response.status);
+    res.send(err.response.statusText);
+  }
 });
 
-export default router;
+export { router, fetchSpotifyAlbum, fetchSpotifyAlbumSearch, fetchSpotifyAlbumTracks, fetchSpotifyArtist, fetchSpotifyAudioFeatures };

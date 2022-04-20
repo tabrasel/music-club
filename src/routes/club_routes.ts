@@ -6,41 +6,46 @@ import { ClubModel } from '../models/ClubModel';
 
 const router: Router = Router();
 
-// Create a new club
-router.post('/api/club', (req: Request, res: Response) => {
-  return ClubModel.createClub(req, res);
+// Create a club
+router.post('/api/club', async (req: Request, res: Response): Promise<void> => {
+  const createdClub: any = await ClubModel.create(req.body.name);
+  res.json(createdClub);
 });
 
-// Update an existing club
-router.put('/api/club', (req: Request, res: Response) => {
-  return ClubModel.updateClub(req, res);
+// Update a club
+router.put('/api/club', async (req: Request, res: Response): Promise<void> => {
+  const updatedClub: any = await ClubModel.update(String(req.query.id), req.body);
+  res.json(updatedClub);
 });
 
-// Delete an existing club
-router.delete('/api/club', (req: Request, res: Response) => {
+// Delete a club
+router.delete('/api/club', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return ClubModel.deleteClub(req, res);
+  const deletedClub: any = await ClubModel.delete(String(req.query.id));
+  res.json(deletedClub);
 });
 
 // Get a club
-router.get('/api/club', (req: Request, res: Response) => {
+router.get('/api/club', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return ClubModel.getClub(req, res);
+  const foundClub: any = await ClubModel.get(String(req.query.id));
+  res.json(foundClub);
 });
 
 // Get all clubs
-router.get('/api/clubs', (req: Request, res: Response) => {
-  return ClubModel.getAllClubs(res);
+router.get('/api/clubs', async (req: Request, res: Response): Promise<void> => {
+  const allClubs: any[] = await ClubModel.getAll();
+  res.json(allClubs);
 });
 
 export default router;

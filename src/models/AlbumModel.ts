@@ -5,6 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 import IAlbum from '../interfaces/IAlbum';
 
+import {
+  fetchSpotifyAlbum,
+  fetchSpotifyArtist,
+  fetchSpotifyAlbumTracks,
+  fetchSpotifyAudioFeatures
+} from '../routes/spotify_routes';
+
 class AlbumModel {
 
   private static model: mongoose.Model<IAlbum>;
@@ -59,87 +66,198 @@ class AlbumModel {
   }
 
   /**
-   * Create a new album document.
+   * Creates an album.
+   * @param spotifyAlbumId Spotify ID of the album
+   * @param posterId       member ID of the album poster
+   * @return the created album document
    */
-  public static createAlbum(req: any, res: Response): void {
-    // Define a document for the album
-    const albumInfo = req.body;
-    const albumDoc: IAlbum = {
-      id: uuidv4(),
-      spotifyId: albumInfo.spotifyId,
-      title: albumInfo.title,
-      artists: albumInfo.artists,
-      artistGenres: albumInfo.artistGenres,
-      trackCount: albumInfo.trackCount,
-      releaseDate: albumInfo.releaseDate,
-      imageUrl: albumInfo.imageUrl,
-      posterId: albumInfo.posterId,
-      pickedTracks: [],
-      tracks: albumInfo.tracks,
-      topDiskNumber: null,
-      topTrackNumber: null
+  public static async create(spotifyAlbumId: string, posterId: string): Promise<IAlbum> {
+    try {
+      // Fetch album data
+      const albumData: any = await AlbumModel.fetchSpotifyAlbumData(spotifyAlbumId);
+
+      // Define post data
+      const postData: any = {
+        posterId,
+        topDiskNumber: null,
+        topTrackNumber: null,
+        tracks: albumData.tracks.map((track: any): any => { return { ...track, pickerIds: [] }; })
+      };
+
+      // Define album document
+      const albumDoc: any = {
+        id: uuidv4(),
+        ...albumData,
+        ...postData
+      };
+
+      // Perform creation
+      const createdAlbum: IAlbum = await this.model.create(albumDoc);
+      return Promise.resolve(createdAlbum);
+    } catch (err: any) {
+      throw err;
     }
-
-    // Create the album document in the database
-    this.model.create(albumDoc, (err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to create album");
-      } else {
-        res.json(album);
-      }
-    });
   }
 
   /**
-   * Update an existing album.
+   * Updates an album.
+   * @param id         ID of the album
+   * @param updateData update data
+   * @return the deleted album
    */
-  public static updateAlbum(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
+  public static async update(id: string, updateData: any): Promise<IAlbum> {
+    // TODO: make sure provided fields are valid in album interface
+    try {
+      // If spotifyId is included, update all album data and clear all post data except posterId. These updates will
+      // be overridden by matching fields in the given updateData
+      if ('spotifyId' in updateData) {
+        const albumUpdateData: any = await AlbumModel.fetchSpotifyAlbumData(updateData.spotifyId);
+        const postUpdateData: any = {
+          topDiskNumber: null,
+          topTrackNumber: null,
+          tracks: albumUpdateData.tracks.map((track: any) => { return { ...track, pickerIds: [] }; })
+        };
 
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedAlbum) => {
-      if (err) {
-        res.json("Failed to update album");
-      } else {
-        res.json(updatedAlbum);
+        updateData = {
+          ...albumUpdateData,
+          ...postUpdateData,
+          ...updateData
+        };
       }
-    });
-  }
 
-  public static deleteAlbum(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
+      // Perform update
+      const updatedAlbum: IAlbum = await this.model.findOneAndUpdate(
+        { id },
+        updateData,
+        { new: true, useFindAndModify: false }
+      );
 
-    query.exec((err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to delete album");
-      } else {
-        res.json(album);
-      }
-    });
+      return Promise.resolve(updatedAlbum);
+    } catch (err: any) {
+      throw err;
+    }
   }
 
   /**
-   * Get a specified album.
+   * Deletes an album.
+   * @param id ID of the album
+   * @return the deleted album
    */
-  public static getAlbum(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, album: Document) => {
-      if (err) {
-        res.json("Failed to get album");
-      } else {
-        res.json(album);
-      }
-    });
+  public static async delete(id: string): Promise<IAlbum> {
+    try {
+      // Perform deletion
+      const deletedAlbum: any = await this.model.findOneAndDelete({ id });
+      return Promise.resolve(deletedAlbum);
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
+  /**
+   * Gets an album.
+   * @param id ID of the album
+   * @return the album
+   */
+  public static async get(id: string): Promise<IAlbum> {
+    try {
+      // Perform search
+      const foundAlbum: IAlbum = await this.model.findOne({ id }).lean();
+      return Promise.resolve(foundAlbum);
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
+  /**
+   * Gets all albums.
+   */
+  public static async getAll(): Promise<IAlbum[]> {
+    const allAlbums: IAlbum[] = await this.model.find({}).lean();
+    return Promise.resolve(allAlbums);
   }
 
   public static getModel() {
     return this.model;
+  }
+
+  /**
+   * Fetches data for an album on Spotify.
+   * @param spotifyAlbumId Spotify ID of the album
+   */
+  private static async fetchSpotifyAlbumData(spotifyAlbumId: string): Promise<any> {
+    // Fetch album from Spotify
+    const spotifyAlbumResult: any = await fetchSpotifyAlbum(spotifyAlbumId);
+    const spotifyAlbum: any = spotifyAlbumResult.data;
+
+    // Fetch album's artists and their associated genres from Spotify
+    const artists: string[] = [];
+    const artistGenres: string[] = [];
+    for (const artist of spotifyAlbum.artists) {
+      const spotifyArtistResult: any = await fetchSpotifyArtist(artist.id);
+      const spotifyArtist: any = spotifyArtistResult.data;
+      artists.push(spotifyArtist.name);
+      artistGenres.push(...spotifyArtist.genres);
+    }
+
+    // Fetch album's tracks from Spotify
+    const spotifyTracksResult: any = await fetchSpotifyAlbumTracks(spotifyAlbum.id);
+    const spotifyTracks: any = spotifyTracksResult.data.items;
+
+    const pitchNotations: string[] = ['C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭', 'A', 'A♯/B♭', 'B'];
+
+    const trackPromises = spotifyTracks.map(async (track: any) => {
+      // Fetch tracks' audio features from Spotify
+      let audioFeatures: any = null;
+
+      try {
+        const spotifyAudioFeaturesResult: any = await fetchSpotifyAudioFeatures(track.id);
+        const spotifyAudioFeatures = spotifyAudioFeaturesResult.data;
+
+        const timeSignature: string = spotifyAudioFeatures.time_signature + '/4';
+        const mode: string = (spotifyAudioFeatures.mode === 1) ? 'major' : 'minor';
+        const key: string = (spotifyAudioFeatures.key === -1) ? 'N/A' : pitchNotations[spotifyAudioFeatures.key];
+
+        audioFeatures = {
+          tempo:            spotifyAudioFeatures.tempo,
+          timeSignature,
+          key,
+          mode,
+          acousticness:     spotifyAudioFeatures.acousticness,
+          energy:           spotifyAudioFeatures.energy,
+          danceability:     spotifyAudioFeatures.danceability,
+          instrumentalness: spotifyAudioFeatures.instrumentalness,
+          liveness:         spotifyAudioFeatures.liveness,
+          speechiness:      spotifyAudioFeatures.speechiness,
+          valence:          spotifyAudioFeatures.valence
+        };
+      } catch (err: any) {
+        // Ignore errors
+      }
+
+      return Promise.resolve({
+        title:       track.name,
+        diskNumber:  track.disc_number,
+        trackNumber: track.track_number,
+        duration:    track.duration_ms,
+        audioFeatures
+      });
+    });
+
+    const tracks: any = await Promise.all(trackPromises);
+
+    // Consolidate album data
+    const albumData: any = {
+      spotifyId:    spotifyAlbum.id,
+      title:        spotifyAlbum.name,
+      artists,
+      artistGenres,
+      trackCount:   spotifyAlbum.total_tracks,
+      releaseDate:  spotifyAlbum.release_date,
+      imageUrl:     spotifyAlbum.images[1].url,
+      tracks
+    }
+
+    return Promise.resolve(albumData);
   }
 
 }

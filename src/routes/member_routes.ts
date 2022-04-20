@@ -6,41 +6,46 @@ import { MemberModel } from '../models/MemberModel';
 
 const router: Router = Router();
 
-// Create a new member
-router.post('/api/member', (req: Request, res: Response) => {
-  return MemberModel.createMember(req, res);
+// Create a member
+router.post('/api/member', async (req: Request, res: Response): Promise<void> => {
+  const createdMember: any = await MemberModel.create(req.body.firstName, req.body.lastName, req.body.color);
+  res.json(createdMember);
 });
 
-// Update an existing member
-router.put('/api/member', (req: Request, res: Response) => {
-  return MemberModel.updateMember(req, res);
+// Update a member
+router.put('/api/member', async (req: Request, res: Response): Promise<void> => {
+  const updatedMember: any = await MemberModel.update(String(req.query.id), req.body);
+  res.json(updatedMember);
 });
 
-// Delete an existing member
-router.delete('/api/member', (req: Request, res: Response) => {
+// Delete a member
+router.delete('/api/member', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return MemberModel.deleteMember(req, res);
+  const deletedMember: any = await MemberModel.delete(String(req.query.id));
+  res.json(deletedMember);
 });
 
 // Get a member
-router.get('/api/member', (req: Request, res: Response) => {
+router.get('/api/member', async (req: Request, res: Response): Promise<void> => {
   if (!('id' in req.query)) {
     res.status(400);
     res.send('Missing required args: id');
     return;
   }
 
-  return MemberModel.getMember(req, res);
+  const foundMember: any = await MemberModel.get(String(req.query.id));
+  res.json(foundMember);
 });
 
 // Get all members
-router.get('/api/members', (req: Request, res: Response) => {
-  return MemberModel.getAllMembers(res);
+router.get('/api/members', async (req: Request, res: Response): Promise<void> => {
+  const allMembers: any[] = await MemberModel.getAll();
+  res.json(allMembers);
 });
 
 export default router;

@@ -34,89 +34,66 @@ class ClubModel {
   }
 
   /**
-   * Create a new club document in the database.
+   * Creates a club in the database.
+   * @param name name of the club
+   * @return the created club
    */
-  public static createClub(req: any, res: Response): void {
-    // Define a document for the club
-    const clubInfo = req.body;
-    const clubDoc: IClub = {
-      id: uuidv4(),
-      name: clubInfo.name,
-      currentRoundId: null,
-      participantIds: [],
-      roundIds: []
+  public static async create(name: string): Promise<IClub> {
+    try {
+      // Define club document
+      const clubDoc: IClub = {
+        id: uuidv4(),
+        name,
+        currentRoundId: null,
+        participantIds: [],
+        roundIds: []
+      };
+
+      // Create club in database
+      const createdClub: IClub = await this.model.create(clubDoc);
+
+      return Promise.resolve(createdClub);
+    } catch (err: any) {
+      throw err;
     }
-
-    // Create the club document in the database
-    this.model.create(clubDoc, (err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to create club");
-      } else {
-        res.json(club);
-      }
-    });
   }
 
   /**
-   * Update an existing club.
+   * Updates a club.
+   * @param id ID of the club to update
+   * @return the updated club
    */
-  public static updateClub(req: any, res: Response): any {
-    const filter: any = { id: req.query.id };
-    const updatedData: any = req.body;
-
-    const query = this.model.findOneAndUpdate(
-      filter,
-      updatedData,
-      { new: true, useFindAndModify: false }
-    );
-
-    query.exec((err: NativeError, updatedClub) => {
-      if (err) {
-        res.json("Failed to update club");
-      } else {
-        res.json(updatedClub);
-      }
-    });
+  public static async update(id: string, updateData: any): Promise<IClub> {
+    const updatedClub: IClub = await this.model.findOneAndUpdate({ id }, updateData, { new: true, useFindAndModify: false });
+    return Promise.resolve(updatedClub);
   }
 
   /**
-   * Delete an existing club.
+   * Deletes a club.
+   * @param id ID of the club to delete
+   * @return the deleted club
    */
-  public static deleteClub(req: any, res: Response): any {
-    const query: any = this.model.findOneAndDelete(req.query);
-
-    query.exec((err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to delete club");
-      } else {
-        res.json(club);
-      }
-    });
+  public static async delete(id: string): Promise<IClub> {
+    const deletedClub: IClub = await this.model.findOneAndDelete({ id });
+    return Promise.resolve(deletedClub);
   }
 
   /**
-   * Get a specified club.
+   * Gets a club.
+   * @param id ID of the club to get
+   * @return the specified club
    */
-  public static getClub(req: any, res: Response): void {
-    const query: any = this.model.findOne(req.query);
-    query.exec((err: NativeError, club: Document) => {
-      if (err) {
-        res.json("Failed to get club");
-      } else {
-        res.json(club);
-      }
-    });
+  public static async get(id: string): Promise<IClub> {
+    const foundClub: IClub = await this.model.findOne({ id }).lean();
+    return Promise.resolve(foundClub);
   }
 
   /**
-   * Get all clubs.
+   * Gets all clubs.
    */
-  public static getAllClubs(res: any): any {
-    const query = this.model.find({});
-    query.exec((err, clubs) => {
-      if (err) res.json("Failed to get all clubs");
-      res.json(clubs);
-    });
+  public static async getAll(): Promise<IClub[]> {
+    const allClubs: IClub[] = await this.model.find({}).lean();
+    return Promise.resolve(allClubs);
   }
 
   public static getModel() {
