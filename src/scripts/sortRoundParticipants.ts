@@ -1,49 +1,43 @@
-import { Database } from '../Database';
+import { DatabaseService } from '../DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../SecretService';
 
-import IMember from '../interfaces/IMember';
 import IRound from '../interfaces/IRound';
 
 import { MemberModel } from '../models/MemberModel';
 import { RoundModel } from '../models/RoundModel';
 
-async function sortRoundParticipants(): Promise<void> {
-  try {
-    const rounds: IRound[] = await RoundModel.getModel().find({}).exec();
 
-    // Update participants of each round
-    const updatePromises = rounds.map(async (round: IRound) => {
-      try {
-        // Sort participant IDs
-        const sortedParticipantIds = await MemberModel.sortMemberIds(round.participantIds);
+async function run(): Promise<void> {
+  const secretService: ISecretService = new SecretServiceGCP();
+  await secretService.setup();
 
-        // Update round with sorted participants
-        const update = { participantIds: sortedParticipantIds };
-        await RoundModel.getModel().findOneAndUpdate({ id: round.id }, update).exec();
+  const databaseService: DatabaseService = new DatabaseService();
+  await databaseService.setup(secretService);
 
-        return Promise.resolve();
-      } catch(err) {
-        // tslint:disable-next-line:no-console
-        console.log(err);
-        process.exit(1);
-      }
-    });
+  databaseService.connect();
 
-    // Wait for all updates to process
-    await Promise.all(updatePromises);
+  MemberModel.setup();
+  RoundModel.setup();
 
-    // Exit
-    process.exit(0);
-  } catch (err) {
-    // tslint:disable-next-line:no-console
-    console.log(err);
-  }
+  const rounds: IRound[] = await RoundModel.getModel().find({}).exec();
+
+  // Update participants of each round
+  const updatePromises = rounds.map(async (round: IRound) => {
+    // Sort participant IDs
+    const sortedParticipantIds = await MemberModel.sortMemberIds(round.participantIds);
+
+    // Update round with sorted participants
+    const update = { participantIds: sortedParticipantIds };
+    await RoundModel.getModel().findOneAndUpdate({ id: round.id }, update).exec();
+
+    return Promise.resolve();
+  });
+
+  // Wait for all updates to process
+  await Promise.all(updatePromises);
+
+  // Exit
+  process.exit(0);
 }
 
-// Connect to database
-Database.connect();
-
-// Set up models
-MemberModel.setup();
-RoundModel.setup();
-
-sortRoundParticipants();
+run();

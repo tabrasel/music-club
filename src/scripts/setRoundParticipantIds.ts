@@ -2,7 +2,8 @@
  * Sets each round's particpantIds by using album poster IDs.
  */
 
-import { Database } from '../Database';
+import { DatabaseService } from '../DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../SecretService';
 
 // Import interfaces
 import IAlbum from '../interfaces/IAlbum';
@@ -12,15 +13,21 @@ import IRound from '../interfaces/IRound';
 import { AlbumModel } from '../models/AlbumModel';
 import { RoundModel } from '../models/RoundModel';
 
-// Connect to database
-Database.connect();
 
-// Set up models
-AlbumModel.setup();
-RoundModel.setup();
+async function run(): Promise<void> {
+  const secretService: ISecretService = new SecretServiceGCP();
+  await secretService.setup();
 
-// Get all rounds
-RoundModel.getModel().find({}, (err: any, rounds: IRound[]) => {
+  const databaseService: DatabaseService = new DatabaseService();
+  await databaseService.setup(secretService);
+
+  databaseService.connect();
+
+  AlbumModel.setup();
+  RoundModel.setup();
+
+  // Get all rounds
+  const rounds: IRound[] = await RoundModel.getModel().find({});
 
   for (const round of rounds) {
     if (round.participantIds.length !== 0) continue;
@@ -39,5 +46,6 @@ RoundModel.getModel().find({}, (err: any, rounds: IRound[]) => {
       RoundModel.getModel().findOneAndUpdate(filter, updatedData, { new: true, useFindAndModify: false, strict: false }).exec();
     });
   }
+}
 
-});
+run();
