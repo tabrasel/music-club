@@ -46,7 +46,9 @@ class DatabaseService implements IDataBaseService {
       console.error.bind(console, 'Connection error:')
     });
 
-    this.mongoUri = await this.secretService.getSecret(this.MONGO_URI_SECRET_NAME);
+    this.mongoUri = (process.env.npm_config_env === 'dev')
+      ? process.env.MONGO_URI
+      : await this.secretService.getSecret(this.MONGO_URI_SECRET_NAME);
   }
 
   public connect(): void {

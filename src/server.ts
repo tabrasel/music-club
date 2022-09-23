@@ -80,11 +80,13 @@ async function start(): Promise<void> {
   // Have server listen for requests
   expressApp.listen(process.env.PORT || 80);
 
-  // tslint:disable-next-line:no-console
-  console.log('Server running on port 80');
+  const port: string = process.env.PORT ? process.env.PORT : '80';
+  const env: string = process.env.npm_config_env ? process.env.npm_config_env : 'production';
+  console.log(`${env} server running on port ${port}`);
 }
 
 
+// Configure access to environment variables
 dotenv.config({ path: './.env'});
 
 start();

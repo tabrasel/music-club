@@ -10,7 +10,7 @@ This is a web service that provides a REST API for performing backend tasks for 
 
 3. Implement the feature. When doing so, try to make clean and modular commits that follow [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) guidelines.
 
-4. Increment the version number in `package.json` following [Semantic Versioning](https://semver.org/) guidelines.
+4. Increment the version number in `package.json` following [Semantic Versioning](https://semver.org/) guidelines and run `npm install` in order to update `package-lock.json`.
 
 5. Document the feature in the `CHANGELOG,md` under 'Unreleased'.
 
@@ -18,8 +18,8 @@ This is a web service that provides a REST API for performing backend tasks for 
 
 ## Deployment
 
-The Music Club Service is hosted on Heroku as 'tb-music-club'. The API itself is available at the endpoint:
-[https://tb-music-club.herokuapp.com/api](https://tb-music-club.herokuapp.com/api).
+The Music Club Service is hosted by GCP App Engine at
+[music-club-service.uw.r.appspot.com/api](music-club-service.uw.r.appspot.com/api).
 
 Only the `main` branch of the music-club-service repository should be deployed to production.
 
@@ -30,6 +30,29 @@ Only the `main` branch of the music-club-service repository should be deployed t
 3. In GitHub, create a pull request to merge `dev` into the `main` branch. Review and merge if everything looks okay.
 
 4. In your local repo, checkout the `main` branch and pull those changes you just merged.
+
+### Deploy Locally
+
+If you want to deploy the service locally using environment variable secrets, run:
+```
+npm start --env=dev
+```
+
+### Deploy To Production With GCP
+
+5. Build the project with:
+```
+npm run build
+```
+
+6. Deploy the project with:
+```
+gcloud app deploy
+```
+
+7. Visit [music-club-service.uw.r.appspot.com/api](music-club-service.uw.r.appspot.com/api) and make sure the welcome message appears.
+
+## Deploy to Production With Heroku (Deprecated)
 
 5. Login to the Heroku CLI:
 ```

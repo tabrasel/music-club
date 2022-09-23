@@ -40,8 +40,14 @@ class StorageServiceAWS implements IStorageService {
   public async setup(secretService: ISecretService): Promise<void> {
     this.bucketName = process.env.AWS_BUCKET_NAME;
     const bucketRegion = process.env.AWS_BUCKET_REGION;
-    const accessKeyId: string = await secretService.getSecret('AWS_Access_Key_ID');
-    const secretAccessKey: string = await secretService.getSecret('AWS_Secret_Access_Key');
+
+    const accessKeyId: string = (process.env.npm_config_env === 'dev')
+      ? process.env.AWS_ACCESS_KEY_ID
+      : await secretService.getSecret('AWS_Access_Key_ID');
+
+    const secretAccessKey: string = (process.env.npm_config_env === 'dev')
+      ? process.env.AWS_SECRET_ACCESS_KEY
+      : await secretService.getSecret('AWS_Secret_Access_Key');
 
     this.s3 = new S3({ accessKeyId, secretAccessKey, region: bucketRegion });
   }
