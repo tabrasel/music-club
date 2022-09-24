@@ -2,8 +2,8 @@
  * Sets each round's particpantIds by using album poster IDs.
  */
 
-import { DatabaseService } from '../DatabaseService';
-import { ISecretService, SecretServiceGCP } from '../SecretService';
+import { DatabaseService } from '../services/DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../services/SecretService';
 
 // Import interfaces
 import IAlbum from '../interfaces/IAlbum';

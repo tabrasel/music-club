@@ -1,5 +1,5 @@
-import { DatabaseService } from '../DatabaseService';
-import { ISecretService, SecretServiceGCP } from '../SecretService';
+import { DatabaseService } from '../services/DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../services/SecretService';
 
 import IAlbum from '../interfaces/IAlbum';
 import IRound from '../interfaces/IRound';

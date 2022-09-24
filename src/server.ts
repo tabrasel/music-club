@@ -6,9 +6,10 @@ import express, { Application } from 'express';
 import session from 'express-session';
 
 // Import internal modules
-import { DatabaseService } from './DatabaseService';
+import { DatabaseService } from './services/DatabaseService';
 import RoundThumbnailManager from './RoundThumbnailManager';
-import { ISecretService, SecretServiceGCP } from './SecretService';
+import { ISecretService, SecretServiceGCP } from './services/SecretService';
+import { IStorageService, StorageServiceAWS } from './services/StorageService';
 
 // Import models
 import { AlbumModel } from './models/AlbumModel';

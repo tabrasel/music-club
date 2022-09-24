@@ -2,8 +2,8 @@
  * Generates a thumbnail image for each round.
  */
 
-import { DatabaseService } from '../DatabaseService';
-import { ISecretService, SecretServiceGCP } from '../SecretService';
+import { DatabaseService } from '../services/DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../services/SecretService';
 import RoundThumbnailManager from '../RoundThumbnailManager';
 
 import IRound from '../interfaces/IRound';
