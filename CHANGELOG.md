@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+* Switched service host from Heroku to Google Cloud Platform.
+
 ## 2.0.0 - 2022-02-16
 
 ### Added

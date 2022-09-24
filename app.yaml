@@ -1,0 +1,5 @@
+runtime: nodejs14
+env_variables:
+  GOOGLE_PROJECT_ID: "284381618542"
+  AWS_BUCKET_NAME: "tb-music-club"
+  AWS_BUCKET_REGION: "us-west-2"
