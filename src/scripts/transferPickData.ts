@@ -2,13 +2,15 @@
  * Sets each round's particpantIds by using album poster IDs.
  */
 
-import { Database } from '../Database';
+import { DatabaseService } from '../services/DatabaseService';
+import { ISecretService, SecretServiceGCP } from '../services/SecretService';
 
 // Import interfaces
 import IAlbum from '../interfaces/IAlbum';
 
 // Import models
 import { AlbumModel } from '../models/AlbumModel';
+
 
 interface ITrack {
   title: string,
@@ -31,44 +33,42 @@ interface ITrack {
   pickerIds: string[]
 };
 
-interface IAlbumUpdateData {
-  topDiskNumber: number,
-  topTrackNumber: number,
-  tracks: ITrack[]
-};
 
-// Connect to database
-Database.connect();
+async function run(): Promise<void> {
+  const secretService: ISecretService = new SecretServiceGCP();
+  await secretService.setup();
 
-// Set up models
-AlbumModel.setup();
+  const databaseService: DatabaseService = new DatabaseService();
+  await databaseService.setup(secretService);
 
-AlbumModel.getAll()
-  .then(async (albums: IAlbum[]): Promise<void> => {
-    for (const album of albums) {
-      // Define update data
-      const albumUpdateData: any = {
-        topDiskNumber: 1,
-        topTrackNumber: album.topTrackNumber,
-        tracks: album.tracks
+  databaseService.connect();
+
+  AlbumModel.setup();
+
+  // Get all albums
+  const albums: IAlbum[] = await AlbumModel.getAll();
+
+  for (const album of albums) {
+    // Define update data
+    const albumUpdateData: any = {
+      topDiskNumber: 1,
+      topTrackNumber: album.topTrackNumber,
+      tracks: album.tracks
+    };
+
+    // Transfer votes
+    for (const pickedTrack of album.pickedTracks) {
+      albumUpdateData.tracks[pickedTrack.trackNumber - 1] = {
+        ...album.tracks[pickedTrack.trackNumber - 1],
+        pickerIds: pickedTrack.pickerIds
       };
-
-      // Transfer votes
-      for (const pickedTrack of album.pickedTracks) {
-        albumUpdateData.tracks[pickedTrack.trackNumber - 1] = {
-          ...album.tracks[pickedTrack.trackNumber - 1],
-          pickerIds: pickedTrack.pickerIds
-        };
-      }
-
-      // Update album
-      await AlbumModel.update(album.id, albumUpdateData);
     }
 
-    process.exit(0);
-  })
-  .catch((err: any): void => {
-    // tslint:disable-next-line:no-console
-    console.log(err);
-    process.exit(1);
-  });
+    // Update album
+    await AlbumModel.update(album.id, albumUpdateData);
+  }
+
+  process.exit(0);
+}
+
+run();

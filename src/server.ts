@@ -1,22 +1,24 @@
-// Import modules
+// Import external modules
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express, { Application } from 'express';
 import session from 'express-session';
-import * as path from 'path';
 
+// Configure access to environment variables
 dotenv.config({ path: './.env'});
 
-import { Database } from './Database';
+// Import internal modules
+import { DatabaseService } from './services/DatabaseService';
+import RoundThumbnailManager from './RoundThumbnailManager';
+import { ISecretService, SecretServiceGCP } from './services/SecretService';
+import { IStorageService, StorageServiceAWS } from './services/StorageService';
 
 // Import models
 import { AlbumModel } from './models/AlbumModel';
 import { ClubModel } from './models/ClubModel';
 import { MemberModel } from './models/MemberModel';
 import { RoundModel } from './models/RoundModel';
-
-import RoundThumbnailManager from './RoundThumbnailManager';
 
 // Import routes
 import albumRoutes from './routes/album_routes';
@@ -27,51 +29,65 @@ import roundRoutes from './routes/round_routes';
 import authRoutes from './routes/auth_routes';
 import { router as spotifyRoutes } from './routes/spotify_routes';
 
-// Connect to database
-Database.connect();
 
-// Set up models
-AlbumModel.setup();
-ClubModel.setup();
-MemberModel.setup();
-RoundModel.setup();
+async function start(): Promise<void> {
+  // Set up services
+  const secretService: ISecretService = new SecretServiceGCP();
+  await secretService.setup();
 
-RoundThumbnailManager.setup();
+  const databaseService: DatabaseService = new DatabaseService();
+  await databaseService.setup(secretService);
 
-// Define Express server
-const expressApp: Application = express();
+  RoundThumbnailManager.setup();
 
-// Add middleware to server
-expressApp.use(cors());
-expressApp.use(express.json());
-expressApp.use(express.urlencoded({ extended: true }));
+  // Connect to database
+  databaseService.connect();
 
-expressApp.use(session({
-  secret: 'keyboard cat',
-  saveUninitialized: false,          // Don't create session until something stored
-  resave: false,                     // Don't save session if unmodified
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    ttl: 3600,                       // Session duration period in seconds
-    autoRemove: 'native'             // Remove session doc on expiry
-  })
-}));
+  // Set up models
+  AlbumModel.setup();
+  ClubModel.setup();
+  MemberModel.setup();
+  RoundModel.setup();
 
-// Add routes to server
-expressApp.use(albumRoutes);
-expressApp.use(clubRoutes);
-expressApp.use(memberRoutes);
-expressApp.use(memberInsightsRoutes);
-expressApp.use(roundRoutes);
-expressApp.use(authRoutes);
-expressApp.use(spotifyRoutes);
+  // Define Express server
+  const expressApp: Application = express();
 
-expressApp.get('/', (req, res) => {
-  res.send('Hello! API is available at api/');
-});
+  // Add middleware to server
+  expressApp.use(cors());
+  expressApp.use(express.json());
+  expressApp.use(express.urlencoded({ extended: true }));
 
-// Have server listen for requests
-expressApp.listen(process.env.PORT || 80);
+  expressApp.use(session({
+    secret: 'keyboard cat',
+    saveUninitialized: false,          // Don't create session until something stored
+    resave: false,                     // Don't save session if unmodified
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 3600,                       // Session duration period in seconds
+      autoRemove: 'native'             // Remove session doc on expiry
+    })
+  }));
 
-// tslint:disable-next-line:no-console
-console.log("Server running on port 80");
+  // Add routes to server
+  expressApp.use(albumRoutes);
+  expressApp.use(clubRoutes);
+  expressApp.use(memberRoutes);
+  expressApp.use(memberInsightsRoutes);
+  expressApp.use(roundRoutes);
+  expressApp.use(authRoutes);
+  expressApp.use(spotifyRoutes);
+
+  expressApp.get('/', (req, res) => {
+    res.send('Hello! API is available at api/');
+  });
+
+  // Have server listen for requests
+  expressApp.listen(process.env.PORT || 80);
+
+  const port: string = process.env.PORT ? process.env.PORT : '80';
+  const env: string = process.env.npm_config_env ? process.env.npm_config_env : 'production';
+  console.log(`${env} server running on port ${port}`);
+}
+
+
+start();

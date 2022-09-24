@@ -1,6 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config({ path: './.env'});
-
 import { createCanvas, loadImage, registerFont } from 'canvas';
 
 import S3 from 'aws-sdk/clients/s3';
