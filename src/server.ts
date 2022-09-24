@@ -5,6 +5,9 @@ import * as dotenv from 'dotenv';
 import express, { Application } from 'express';
 import session from 'express-session';
 
+// Configure access to environment variables
+dotenv.config({ path: './.env'});
+
 // Import internal modules
 import { DatabaseService } from './services/DatabaseService';
 import RoundThumbnailManager from './RoundThumbnailManager';
@@ -86,8 +89,5 @@ async function start(): Promise<void> {
   console.log(`${env} server running on port ${port}`);
 }
 
-
-// Configure access to environment variables
-dotenv.config({ path: './.env'});
 
 start();
